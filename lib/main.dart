@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/Model/User.dart';
+import 'package:news_app/View/UserView.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,8 +18,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-
+      home: UserView(user: User(name: "Lê Hữu Thành", age: 20)),
     );
   }
 }
+
 
