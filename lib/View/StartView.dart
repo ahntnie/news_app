@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/View/HomeView.dart';
 
 class StartView extends StatelessWidget {
   const StartView({super.key});
@@ -42,7 +43,12 @@ class StartView extends StatelessWidget {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10)),
                         child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomeView()));
+                            },
                             style: ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
                                     Colors.pink.shade800)),
