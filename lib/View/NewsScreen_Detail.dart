@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:news_app/View/Screen/NewsScreen_Detail/widget/drawer.dart';
 
 class NewsDetail extends StatefulWidget {
   const NewsDetail({super.key});
@@ -195,7 +194,6 @@ class _NewsDetailState extends State<NewsDetail> {
           ],
         ),
       ),
-      drawer: const drawer(),
     );
   }
 }
