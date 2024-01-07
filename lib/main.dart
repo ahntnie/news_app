@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/Model/User.dart';
@@ -5,13 +7,14 @@ import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/StartView.dart';
 import 'package:news_app/View/UserView.dart';
 
+import 'View/CategoryView.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
