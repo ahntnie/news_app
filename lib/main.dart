@@ -2,17 +2,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/Model/User.dart';
 import 'package:news_app/View/HomeView.dart';
+import 'package:news_app/View/NewsLevel.dart';
 import 'package:news_app/View/NewsScreen_Detail.dart';
 import 'package:news_app/View/StartView.dart';
 import 'package:news_app/View/UserView.dart';
+import 'package:news_app/test.dart';
 
 import 'firebase_options.dart';
 
 Future<void> main() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -28,6 +30,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         debugShowCheckedModeBanner: false,
-        home: const NewsDetail());
+        home: const HomeView());
   }
 }
