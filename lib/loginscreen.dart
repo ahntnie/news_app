@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:news_app/signupscreen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -7,6 +8,42 @@ class LoginScreen extends StatefulWidget {
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
+}
+
+Future<User?> signInWithGoogle() async {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  GoogleSignInAccount? googleSignInAccount;
+
+  try {
+    googleSignInAccount =
+        await googleSignIn.signIn().catchError((onError) => null);
+  } catch (e) {
+    print("Không đăng nhập được!!!");
+  }
+
+  if (googleSignInAccount != null) {
+    final GoogleSignInAuthentication googleAuth =
+        await googleSignInAccount!.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    try {
+      final UserCredential authResult =
+          await auth.signInWithCredential(credential);
+      final User? user = authResult.user;
+      String? userName = user!.displayName;
+      print('Tên Gmail của người dùng: $userName');
+      return user;
+    } on FirebaseAuthException catch (e) {
+    } catch (e) {
+      // ...
+    }
+  }
+  return null;
 }
 
 Future<User?> loginUsingEmailPassword(
@@ -54,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (accountPassword.length < 8 ||
           !accountPassword.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
         _accountPasswordError =
-            'Mật khẩu phải tối đa 8 kí tự và chứa kí tự đặc biệt';
+            'Mật khẩu tối đa 8 kí tự và chứa kí tự đặc biệt';
       } else {
         _accountPasswordError = '';
       }
@@ -153,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 border: InputBorder.none,
                                 labelText: "Nhập tên tài khoản",
                                 labelStyle: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 contentPadding:
@@ -189,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 border: InputBorder.none,
                                 labelText: "Nhập mật khẩu",
                                 labelStyle: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 suffixIcon: GestureDetector(
@@ -215,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const Padding(
-                          padding: EdgeInsets.only(top: 10, left: 180),
+                          padding: EdgeInsets.only(top: 10, left: 160),
                           child: InkWell(
                             child: Text(
                               "Quên mật khẩu",
@@ -239,15 +276,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         validateAccountName();
                         validatePassword();
-                        User? user = await loginUsingEmailPassword(
+                        var user = await loginUsingEmailPassword(
                             email: _accountNameController.text,
                             password: _passwordController.text,
                             context: context);
                         print(user);
                         if (user != null) {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => const SignupScreen()));
+                          _showSuccessDialog(context);
+                        } else {
+                          print("User or Password is not Correct !!");
+                          _showFailedDialog(context);
                         }
                         ;
                       },
@@ -266,17 +304,27 @@ class _LoginScreenState extends State<LoginScreen> {
                               const Size(double.infinity, 60)),
                           backgroundColor:
                               MaterialStateProperty.all<Color>(Colors.white)),
-                      onPressed: () {},
+                      onPressed: () {
+                        signInWithGoogle().then((userCredential) {
+                          print("đăng nhập thành công");
+                          _showSuccessDialog(context);
+                        }).catchError((error) {
+                          _showFailedDialog(context);
+                          print('Sign in with Google error: $error');
+                        });
+                        ;
+                      },
                       child: const Text(
                         "Đăng nhập bằng Google",
                         style: TextStyle(color: Colors.black, fontSize: 18),
                       )),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 20, left: 80),
+                SizedBox(
+                  height: 100,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Bạn chưa có tài khoản ?",
                         style: TextStyle(
                             color: Colors.black,
@@ -284,7 +332,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.bold),
                       ),
                       InkWell(
-                        child: Text(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const SignupScreen()));
+                        },
+                        child: const Text(
                           "Đăng ký",
                           style: TextStyle(
                               fontSize: 18,
@@ -294,12 +346,80 @@ class _LoginScreenState extends State<LoginScreen> {
                       )
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Colors.green,
+              ),
+              SizedBox(width: 5),
+              Text(
+                'Đăng nhập thành công',
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Chúc mừng! Bạn đã đăng nhập thành công.',
+            style: TextStyle(fontSize: 20),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const SignupScreen()));
+              },
+              child: const Text('Đóng'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFailedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(
+                Icons.close_outlined,
+                color: Colors.red,
+              ),
+              SizedBox(width: 5),
+              Text('Đăng nhập thất bại'),
+            ],
+          ),
+          content: const Text(
+            'Tên tài khoản hoặc mật khẩu không đúng !! Vui lòng đăng nhập lại',
+            style: TextStyle(fontSize: 20),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Đóng'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
