@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/View/HomeView.dart';
+import 'package:news_app/View/NotificationView.dart';
+
+import 'ProfileView.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key, required this.idx});
@@ -60,16 +63,16 @@ class _BottomNavState extends State<BottomNav> {
           if (widget.idx != 1) {
             print("Thông báo");
             //Trang thông báo
-            // Navigator.of(context).push(MaterialPageRoute(
-            //     builder: (context) => const Profile_screen()));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const NotificationView()));
           }
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
             print("Tài khoản");
             // Trang profile
-            // Navigator.of(context).push(MaterialPageRoute(
-            //     builder: (context) => const Profile_screen()));
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ProfileView()));
           }
         }
       },

@@ -1,6 +1,14 @@
 class News {
+  String category;
   String title;
-  String content;
+  String description;
   String img;
-  News({required this.title, required this.content, required this.img});
+  String urlHtml;
+  News({
+    required this.title,
+    required this.description,
+    required this.img,
+    required this.urlHtml,
+    required this.category,
+  });
 }

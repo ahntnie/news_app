@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Repository/NewsRepository.dart';
+import 'package:news_app/View/CategoryNewView.dart';
+import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/HomeView.dart';
 
 import '../Model/News.dart';
@@ -11,46 +14,6 @@ class DrawerView extends StatefulWidget {
   State<DrawerView> createState() => _DrawerViewState();
 }
 
-final lstNews = [
-  News(
-    title:
-        "Bí thư Hà Nội: Sớm xây ba cầu vượt sông Hồng, Đuống trên vành đai 4",
-    content:
-        "HÀ NỘI __ Để khai thác đường song hành vành đai 4 cuối năm 2025, phải sớm xây cầu Mễ Sở, Hồng Hà vượt sông Hồng và Hoài Thượng qua sông Đuống, theo Bí thư Hà Nội.",
-    img:
-        "https://i1-vnexpress.vnecdn.net/2024/01/04/cauhongha-1704369441-8047-1704369899.png?w=240&h=144&q=100&dpr=1&fit=crop&s=dCjJCJpKAK2p4dzZC5o7cQ",
-  ),
-  News(
-    title: "Dugarry: 'Mbappe đang trì trệ ở PSG'",
-    content:
-        "PHÁP __ Cựu tiền đạo Pháp Christophe Dugarry khuyên Kylian Mbappe nên rời PSG sớm để thôi làm phiền đội bóng.",
-    img:
-        "https://i1-thethao.vnecdn.net/2024/01/04/mbappe-3529-1704305353-1704328-9077-7792-1704328646.jpg?w=&h=&q=100&dpr=1&fit=crop&s=s_JLDJ_J2nSDiXOJJGlznw",
-  ),
-  News(
-    title:
-        "20 đại học Mỹ hỗ trợ tài chính hào phóng nhất cho sinh viên quốc tế",
-    content:
-        "20 đại học hào phóng nhất hỗ trợ cho sinh viên quốc tế trung bình 77.000 USD (1,87 tỷ đồng) một năm, cao hơn... ",
-    img:
-        "https://i1-vnexpress.vnecdn.net/2023/12/30/406446658-381434821070997-4506-8994-3901-1703953071.png?w=380&h=228&q=100&dpr=1&fit=crop&s=YECovCY7JW4qkHIL_AqxxA",
-  ),
-  News(
-    title:
-        "Phong cách đặc trưng của Pharrell Williams trong BST đầu tiên tại Louis Vuitton",
-    content:
-        "Pharrell Williams khởi đầu chương mới tại Louis Vuitton với cương vị Giám đốc sáng tạo, lồng ghép dấu ấn cá nhân vào di sản thiết kế thương hiệu trong BST Xuân Hè 2024. ",
-    img:
-        "https://i1-giaitri.vnecdn.net/2024/01/03/image1081269697extractword0out-769767-1704269983-1704275809.jpeg?w=240&h=144&q=100&dpr=1&fit=crop&s=y04U7t3ckwApRXgnh7H-kA",
-  ),
-  News(
-    title: "Giá xăng, dầu cùng giảm",
-    content:
-        "Mỗi lít xăng giảm 180-230 đồng, các mặt hàng dầu cũng hạ 190-500 đồng tùy loại, từ 15h hôm nay.",
-    img:
-        "https://i1-kinhdoanh.vnecdn.net/2024/01/04/xangdau2020ngocthanh-170433783-4368-6518-1704355152.jpg?w=220&h=132&q=100&dpr=1&fit=crop&s=ouIKM6_1Yk7iij1l1zf0ug",
-  ),
-];
 bool onTap_ThoiSu = false;
 bool onTap_TheThao = false;
 bool onTap_NgheThuat = false;
@@ -153,50 +116,7 @@ class _DrawerViewState extends State<DrawerView> {
                     ],
                   ),
                 ),
-                if (onTap_ThoiSu)
-                  SizedBox(
-                    child: Column(children: [
-                      ListTile(
-                        onTap: () {},
-                        title: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black))),
-                          child: const Text(
-                            "Tin mới nhất",
-                            style: TextStyle(color: Colors.black, fontSize: 10),
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        onTap: () {},
-                        title: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black))),
-                          child: const Text(
-                            "Ảnh / Video",
-                            style: TextStyle(color: Colors.black, fontSize: 10),
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        onTap: () {},
-                        title: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black))),
-                          child: const Text(
-                            "Xem nhiều",
-                            style: TextStyle(color: Colors.black, fontSize: 10),
-                          ),
-                        ),
-                      ),
-                    ]),
-                  )
+                if (onTap_ThoiSu) selectMethod("Thời sự")
               ],
             ),
           ),
@@ -232,53 +152,7 @@ class _DrawerViewState extends State<DrawerView> {
                       ],
                     ),
                   ),
-                  if (onTap_TheThao)
-                    SizedBox(
-                      child: Column(children: [
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Tin mới nhất",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Ảnh / Video",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Xem nhiều",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    )
+                  if (onTap_TheThao) selectMethod("Thể thao")
                 ],
               )),
           ListTile(
@@ -313,53 +187,7 @@ class _DrawerViewState extends State<DrawerView> {
                       ],
                     ),
                   ),
-                  if (onTap_NgheThuat)
-                    SizedBox(
-                      child: Column(children: [
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Tin mới nhất",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Ảnh / Video",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Xem nhiều",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    )
+                  if (onTap_NgheThuat) selectMethod("Nghệ thuật")
                 ],
               )),
           ListTile(
@@ -394,57 +222,84 @@ class _DrawerViewState extends State<DrawerView> {
                       ],
                     ),
                   ),
-                  if (onTap_GiaoDuc)
-                    SizedBox(
-                      child: Column(children: [
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Tin mới nhất",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Ảnh / Video",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Xem nhiều",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    )
+                  if (onTap_GiaoDuc) selectMethod("Giáo dục")
                 ],
               )),
         ],
       ),
+    );
+  }
+
+  SizedBox selectMethod(String name) {
+    return SizedBox(
+      child: Column(children: [
+        ListTile(
+          onTap: () {
+            if (name == "Thời sự") {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_ThoiSu[0],
+                      )));
+            } else if (name == "Thể thao") {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_TheThao[0],
+                      )));
+            } else if (name == "Giáo dục") {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_GiaoDuc[0],
+                      )));
+            } else {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_NgheThuat[0],
+                      )));
+            }
+          },
+          title: Container(
+            alignment: Alignment.topLeft,
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black))),
+            child: const Text(
+              "Tin mới nhất",
+              style: TextStyle(color: Colors.black, fontSize: 10),
+            ),
+          ),
+        ),
+        ListTile(
+          onTap: () {},
+          title: Container(
+            alignment: Alignment.topLeft,
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black))),
+            child: const Text(
+              "Ảnh / Video",
+              style: TextStyle(color: Colors.black, fontSize: 10),
+            ),
+          ),
+        ),
+        ListTile(
+          onTap: () {
+            Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => CategoryView(name: name)));
+          },
+          title: Container(
+            alignment: Alignment.topLeft,
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black))),
+            child: const Text(
+              "Xem nhiều",
+              style: TextStyle(color: Colors.black, fontSize: 10),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }

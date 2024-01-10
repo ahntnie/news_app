@@ -8,6 +8,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Model/News.dart';
 import 'package:news_app/Presenter/NewsPresenter.dart';
 import 'package:news_app/Repository/NewsRepository.dart';
+import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/DrawerView.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -79,16 +80,21 @@ class _HomeViewState extends State<HomeView> {
   //   PhatVideo();
   //   super.initState();
   // }
-  static List<News> lstNews =
-      List.filled(0, News(title: "", content: "", img: ""), growable: true);
-  static List<News> lstNews_ThoiSu =
-      List.filled(0, News(title: "", content: "", img: ""), growable: true);
-  static List<News> lstNews_TheThao =
-      List.filled(0, News(title: "", content: "", img: ""), growable: true);
-  static List<News> lstNews_GiaoDuc =
-      List.filled(0, News(title: "", content: "", img: ""), growable: true);
-  static List<News> lstNews_NgheThuat =
-      List.filled(0, News(title: "", content: "", img: ""), growable: true);
+  static List<News> lstNews = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
+  static List<News> lstNews_ThoiSu = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
+  static List<News> lstNews_TheThao = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
+  static List<News> lstNews_GiaoDuc = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
+  static List<News> lstNews_NgheThuat = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
   @override
   void initState() {
     super.initState();
@@ -184,7 +190,7 @@ class _HomeViewState extends State<HomeView> {
                     itemCount: lstNews.length,
                     itemBuilder: (context, index, realIndex) {
                       final news = lstNews[index].img;
-                      return buildImage(news, index, lstNews[index].title);
+                      return buildImage(news, index, lstNews[index], context);
                     },
                     options: CarouselOptions(
                         disableCenter: true,
@@ -202,17 +208,13 @@ class _HomeViewState extends State<HomeView> {
                     child: Column(
                       children: [
                         titleCategory("Thời sự"),
-                        newsCard(context, lstNews_ThoiSu[0].title,
-                            lstNews[0].content, lstNews_ThoiSu[0].img),
+                        newsCard(context, lstNews_ThoiSu[0]),
                         titleCategory("Thể thao"),
-                        newsCard(context, lstNews_TheThao[0].title,
-                            lstNews[0].content, lstNews_TheThao[0].img),
+                        newsCard(context, lstNews_TheThao[0]),
                         titleCategory("Giáo dục"),
-                        newsCard(context, lstNews_GiaoDuc[0].title,
-                            lstNews[0].content, lstNews_GiaoDuc[0].img),
+                        newsCard(context, lstNews_GiaoDuc[0]),
                         titleCategory("Nghệ thuật"),
-                        newsCard(context, lstNews_NgheThuat[0].title,
-                            lstNews[0].content, lstNews_NgheThuat[0].img),
+                        newsCard(context, lstNews_NgheThuat[0]),
                       ],
                     )),
                 const Divider(),
@@ -292,10 +294,12 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  ListTile newsCard(
-      BuildContext context, String title, String content, String img) {
+  ListTile newsCard(BuildContext context, News news) {
     return ListTile(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CategoryDetailView(news: news)));
+      },
       title: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -310,7 +314,7 @@ class _HomeViewState extends State<HomeView> {
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 child: Image.network(
-                  img,
+                  news.img,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -322,14 +326,14 @@ class _HomeViewState extends State<HomeView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      news.title,
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      content,
+                      news.description,
                       style: const TextStyle(
                         fontSize: 8,
                       ),
@@ -395,35 +399,45 @@ class _HomeViewState extends State<HomeView> {
   void animateToSlide(int index) => controller.animateToPage(index);
 }
 
-Widget buildImage(String assetImage, int index, String title) =>
-    Stack(children: [
-      SizedBox(
-        width: double.infinity,
-        child: ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-            child: Image.network(assetImage, fit: BoxFit.cover, scale: 10)),
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 70,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: Colors.black38,
+Widget buildImage(
+        String assetImage, int index, News news, BuildContext context) =>
+    ListTile(
+      onTap: () {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CategoryDetailView(
+                  news: news,
+                )));
+      },
+      title: Stack(children: [
+        SizedBox(
+          width: double.infinity,
+          child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              child: Image.network(assetImage, fit: BoxFit.fill, scale: 10)),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              width: double.infinity,
+              height: 70,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: Colors.black38,
+              ),
+              child: Text(
+                news.title,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
-            child: Text(
-              title,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      )
-    ]);
+          ],
+        )
+      ]),
+    );
 
 class CategoryTile extends StatelessWidget {
   const CategoryTile({super.key, this.categoryName, this.image});
