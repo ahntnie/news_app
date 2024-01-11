@@ -2,11 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/Model/User.dart';
 import 'package:news_app/View/HomeView.dart';
-import 'package:news_app/View/NewsLevel.dart';
+import 'package:news_app/View/NewsLevelView.dart';
 import 'package:news_app/View/NewsScreen_Detail.dart';
 import 'package:news_app/View/StartView.dart';
 import 'package:news_app/View/UserView.dart';
-import 'package:news_app/test.dart';
 
 import 'firebase_options.dart';
 
