@@ -11,6 +11,7 @@ import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:video_player/video_player.dart';
 
@@ -46,7 +47,7 @@ final categories = [
   CategoryModel(
       categoryName: "Nghệ thuật", image: "assets/image/nghethuat.jpg"),
 ];
-
+final SizerUtil sizerUtil = SizerUtil();
 bool onTap_ThoiSu = false;
 bool onTap_TheThao = false;
 bool onTap_NgheThuat = false;
@@ -111,6 +112,17 @@ class _HomeViewState extends State<HomeView> {
         lstNews_NgheThuat = NewsRepository.lstNews_NgheThuat;
       });
     });
+  }
+
+  double FontSize(double value, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    // Tính toán kích thước font chữ dựa trên kích thước màn hình và độ phân giải
+    final fontSize = screenWidth * screenHeight * pixelRatio * value * 0.001;
+
+    return fontSize;
   }
 
   @override

@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/HomeView.dart';
+import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NotificationView.dart';
 
 import 'ProfileView.dart';
@@ -12,18 +15,16 @@ class BottomNav extends StatefulWidget {
   State<BottomNav> createState() => _BottomNavState();
 }
 
-hexStringToColor(String hexColor) {
-  hexColor = hexColor.toUpperCase().replaceAll("#", "");
-  if (hexColor.length == 6) {
-    hexColor = "FF$hexColor";
-  }
-  return Color(int.parse(hexColor, radix: 16));
-}
+final FirebaseAuth auth = FirebaseAuth.instance;
+// String? name = FirebaseAuth.instance.currentUser!.displayName;
+// String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
+User? _currentUser = auth.currentUser;
+TextEditingController txt_RoomName = TextEditingController();
 
 class _BottomNavState extends State<BottomNav> {
-  TextEditingController txt_RoomName = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    //print(name);
     return BottomNavigationBar(
       items: [
         BottomNavigationBarItem(
@@ -41,14 +42,13 @@ class _BottomNavState extends State<BottomNav> {
             label: "Thông báo"),
         BottomNavigationBarItem(
             icon: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(50)),
-              child: Image.asset(
-                "assets/image/vien.jpg",
-                fit: BoxFit.cover,
-                height: 30,
-                width: 30,
-              ),
-            ),
+                borderRadius: const BorderRadius.all(Radius.circular(50)),
+                child: Image.asset(
+                  "assets/image/vien.jpg",
+                  fit: BoxFit.cover,
+                  height: 30,
+                  width: 30,
+                )),
             label: "Tài khoản"),
       ],
       currentIndex: widget.idx,
@@ -69,10 +69,14 @@ class _BottomNavState extends State<BottomNav> {
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
-            print("Tài khoản");
-            // Trang profile
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const ProfileView()));
+            _currentUser == null
+                ? Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const LoginView()))
+                :
+
+                // Trang profile
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ProfileView()));
           }
         }
       },

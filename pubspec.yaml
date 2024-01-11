@@ -52,6 +52,7 @@ dependencies:
   firebase_auth: ^4.16.0
   google_sign_in: ^6.2.1
   firebase_app_check: ^0.2.1+8
+  sizer: ^2.0.15
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true

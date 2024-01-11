@@ -22,6 +22,11 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   final cmt = TextEditingController();
   String gmtt = "";
   List<String> descriptions = [];
+  List<String> contents = [];
+  List<String> imageUrls = [];
+  List<String> test = [];
+  List<String> test1 = [];
+  bool flag = true;
   @override
   void initState() {
     super.initState();
@@ -44,15 +49,43 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   Future<void> fetchData() async {
     try {
-      final response = await http.get(Uri.parse(widget.news.urlHtml));
-      final document = parse(response.body);
-      gmtt = response.headers['date'].toString();
+      if (flag) {
+        final response = await http.get(Uri.parse(widget.news.urlHtml));
+        final document = parse(response.body);
 
-      final descriptionElements = document.querySelectorAll('.Normal');
-      setState(() {
-        descriptions = descriptionElements.map((e) => e.innerHtml).toList();
-      });
-      //print(descriptions.length);
+        // final gmt = parse(response.headers);
+        gmtt = response.headers['date'].toString();
+        final fullClass = document.querySelectorAll('.fck_detail');
+        // print(fullClass.length);
+        fullClass.forEach((element) {
+          final imageElement = document.querySelectorAll('.fig-picture');
+          imageElement.forEach((e) {
+            final img = e.outerHtml
+                .toString()
+                .substring(
+                  e.outerHtml.toString().lastIndexOf("srcset=") + 8,
+                  e.outerHtml.toString().lastIndexOf("1x"),
+                )
+                .replaceAll("amp;", '');
+
+            imageUrls.add(img.trim());
+          });
+        });
+
+        //print(fullClass[0].toString().split('div class="fig-picture"'));
+
+        setState(() {
+          flag = false;
+          contents = fullClass.map((e) => e.innerHtml).toList();
+
+          test = contents[0].split('<figure data-size="true"');
+
+          test.forEach((txt) {
+            test1 = test1 + txt.split("</picture></div>");
+          });
+          print(test1.length);
+        });
+      }
     } catch (e) {
       print('Error: $e');
     }
@@ -60,6 +93,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    int count = 0;
+    int count1 = 0;
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -131,23 +166,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height / 4,
-                child: Image.network(
-                  widget.news.img,
-                  fit: BoxFit.fill,
-                ),
-              ),
+              
               const SizedBox(
                 height: 10,
               ),
               Column(
-                children: descriptions
-                    .map(
-                      (e) => Html(data: e),
-                    )
-                    .toList(),
+                children: test1.map((e) {
+                  int index = test1.length > count ? count++ : test1.length - 1;
+                  return index.isEven
+                      ? Html(data: test1[index])
+                      : Image.network(imageUrls[imageUrls.length > count1
+                          ? count1++
+                          : imageUrls.length - 1]);
+                }).toList(),
               ),
               const SizedBox(
                 height: 20,
