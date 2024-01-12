@@ -108,14 +108,6 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_rounded,
-            color: Colors.black,
-            size: 40,
-          ),
-          onPressed: () {},
-        ),
         title: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(

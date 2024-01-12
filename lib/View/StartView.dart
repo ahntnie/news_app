@@ -1,8 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/Model/User.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/View/HomeView.dart';
 
-class StartView extends StatelessWidget {
+class StartView extends StatefulWidget {
   const StartView({super.key});
+
+  @override
+  State<StartView> createState() => _StartViewState();
+}
+
+class _StartViewState extends State<StartView> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    UserPresenter.getUser(User(
+        name: "Lê Hữu Thành",
+        email: "thanh@gmail.com",
+        password: "123",
+        birth: DateTime(2003, 5, 23),
+        phone: "09876556544",
+        gender: true));
+  }
 
   @override
   Widget build(BuildContext context) {

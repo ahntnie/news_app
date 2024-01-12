@@ -17,14 +17,14 @@ class _NotificationViewState extends State<NotificationView> {
         idx: 1,
       ),
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_rounded,
-            color: Colors.black,
-            size: 40,
-          ),
-          onPressed: () {},
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(
+        //     Icons.arrow_back_ios_rounded,
+        //     color: Colors.black,
+        //     size: 40,
+        //   ),
+        //   onPressed: () {},
+        // ),
         title: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
