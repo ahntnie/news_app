@@ -306,55 +306,58 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  ListTile newsCard(BuildContext context, News news) {
-    return ListTile(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CategoryDetailView(news: news)));
-      },
-      title: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.grey.shade200,
-        ),
-        width: double.infinity,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 100,
-              height: 100,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Image.network(
-                  news.img,
-                  fit: BoxFit.cover,
+  Padding newsCard(BuildContext context, News news) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CategoryDetailView(news: news)));
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.grey.shade200,
+          ),
+          width: double.infinity,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  child: Image.network(
+                    news.img,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 5.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      news.title,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        news.title,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      news.description,
-                      style: const TextStyle(
-                        fontSize: 8,
-                      ),
-                    )
-                  ],
+                      Text(
+                        news.description,
+                        style: const TextStyle(
+                          fontSize: 8,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -413,7 +416,7 @@ class _HomeViewState extends State<HomeView> {
 
 Widget buildImage(
         String assetImage, int index, News news, BuildContext context) =>
-    ListTile(
+    InkWell(
       onTap: () {
         Navigator.popUntil(context, (route) => route.isFirst);
         Navigator.of(context).push(MaterialPageRoute(
@@ -421,7 +424,7 @@ Widget buildImage(
                   news: news,
                 )));
       },
-      title: Stack(children: [
+      child: Stack(children: [
         SizedBox(
           width: double.infinity,
           child: ClipRRect(

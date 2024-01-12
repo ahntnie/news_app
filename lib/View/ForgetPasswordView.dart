@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/View/HomeView.dart';
 
 class ForgetPasswordView extends StatefulWidget {
   const ForgetPasswordView({super.key});
@@ -54,8 +55,7 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
             color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(20),
           ),
-          width: MediaQuery.of(context).size.width / 1.8,
-          height: 50,
+          width: MediaQuery.of(context).size.width / 2,
           child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -65,9 +65,9 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
                   Text(
                     "Quên mật khẩu",
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -77,89 +77,83 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 70, left: 20, right: 20),
-              child: Column(
-                children: [
-                  Container(
-                    alignment: Alignment.topLeft,
-                    decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.blue.shade200, width: 2.0),
-                      color: Colors.blue.shade100,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 2.4,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10, top: 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Nhập Email của tài khoản",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10,
-                              right: 10,
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              height: 60,
-                              child: TextField(
-                                controller: _email,
-                                onChanged: (_) => validateEmail(),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: _emailError.isEmpty
-                                      ? 'Nhập email của bạn....'
-                                      : " ",
-                                  labelStyle: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  errorText: _emailError.isNotEmpty
-                                      ? _emailError
-                                      : null,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: size(context, 10), vertical: size(context, 40)),
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.topLeft,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue.shade200, width: 2.0),
+                  color: Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size(context, 7),
+                      vertical: size(context, 15)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Nhập Email của tài khoản",
+                        style: TextStyle(
+                            fontSize: size(context, 7),
+                            fontWeight: FontWeight.bold),
                       ),
-                    ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: TextField(
+                          controller: _email,
+                          onChanged: (_) => validateEmail(),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: "Nhập email",
+                            labelStyle: TextStyle(
+                              fontSize: size(context, 6),
+                            ),
+                            contentPadding: EdgeInsets.only(
+                                left: size(context, 6), bottom: 10),
+                            errorText:
+                                _emailError.isNotEmpty ? _emailError : null,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Center(
-                    child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Colors.blue.shade100)),
-                        onPressed: () {
-                          validateEmail();
-                          if (_emailError.isEmpty) {
-                            _showSuccessDialog(context);
-                            resetPassword(_email.text);
-                          } else {
-                            _showFailedDialog(context);
-                          }
-                        },
-                        child: const Text(
-                          "Gửi email",
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                        )),
-                  ),
-                ],
+                ),
               ),
-            )),
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: size(context, 5)),
+                  child: ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.blue.shade100)),
+                      onPressed: () {
+                        validateEmail();
+                        if (_emailError.isEmpty) {
+                          _showSuccessDialog(context);
+                          resetPassword(_email.text);
+                        } else {
+                          _showFailedDialog(context);
+                        }
+                      },
+                      child: const Text(
+                        "Gửi email",
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                      )),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
