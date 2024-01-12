@@ -1,16 +1,7 @@
-import 'package:card_swiper/card_swiper.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Model/News.dart';
-import 'package:news_app/Presenter/NewsPresenter.dart';
-import 'package:news_app/Repository/NewsRepository.dart';
-import 'package:news_app/View/CategoryDetailView.dart';
-import 'package:news_app/View/CategoryView.dart';
-import 'package:news_app/View/DrawerView.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:video_player/video_player.dart';
 
@@ -60,19 +51,19 @@ double size(BuildContext context, int baseSize) {
   return baseSize * (screenSize / baseScreenSize);
 }
 
-Future<void> PhatVideo() async {
-  final ref = FirebaseStorage.instance.ref('vidoe đồ án .mp4');
-  final url = await ref.getDownloadURL();
-  final controller = VideoPlayerController.networkUrl(Uri.parse(url));
-  controller.initialize();
-  controller.play();
-  video = Center(
-    child: AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: VideoPlayer(controller),
-    ),
-  );
-}
+// Future<void> PhatVideo() async {
+//   final ref = FirebaseStorage.instance.ref('vidoe đồ án .mp4');
+//   final url = await ref.getDownloadURL();
+//   final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+//   controller.initialize();
+//   controller.play();
+//   video = Center(
+//     child: AspectRatio(
+//       aspectRatio: controller.value.aspectRatio,
+//       child: VideoPlayer(controller),
+//     ),
+//   );
+// }
 
 class _HomeViewState extends State<HomeView> {
   // @override
@@ -115,235 +106,623 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    if (lstNews.isEmpty ||
-        lstNews_GiaoDuc.isEmpty ||
-        lstNews_NgheThuat.isEmpty ||
-        lstNews_TheThao.isEmpty ||
-        lstNews_ThoiSu.isEmpty) {
-      Load();
-      return Center(
-        child: Stack(
-          children: [
-            SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Image.asset(
-                  "assets/image/iconNews.jpg",
-                  fit: BoxFit.fill,
-                )),
-            Padding(
-              padding: const EdgeInsets.only(top: 400),
-              child: LoadingAnimationWidget.hexagonDots(
-                color: Colors.grey,
-                size: 50,
-              ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(20),
             ),
-          ],
+            width: MediaQuery.of(context).size.width / 2.2,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("VLTT "),
+                Text(
+                  "Tin tức",
+                  style: TextStyle(color: Colors.blue),
+                )
+              ],
+            ),
+          ),
+          centerTitle: true,
         ),
-      );
-    } else {
-      return SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              title: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                width: MediaQuery.of(context).size.width / 2.2,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("VLTT "),
-                    Text(
-                      "Tin tức",
-                      style: TextStyle(color: Colors.blue),
-                    )
+                    Container(
+                      color: Colors.grey.shade300,
+                      width: double.infinity,
+                      height: 60,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("VLTT "),
+                          Text(
+                            "Tin tức",
+                            style: TextStyle(color: Colors.blue),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(8),
+                          hintText: 'Tìm kiếm...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          suffixIcon: const Icon(Icons.search),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              centerTitle: true,
-            ),
-            drawer: const DrawerView(),
-            body: SingleChildScrollView(
-              child: Column(children: [
-                Container(
-                  margin: const EdgeInsets.only(left: 10.0),
-                  height: 70,
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        return CategoryTile(
-                          image: categories[index].image,
-                          categoryName: categories[index].categoryName,
-                        );
-                      }),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CarouselSlider.builder(
-                    carouselController: controller,
-                    itemCount: lstNews.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final news = lstNews[index].img;
-                      return buildImage(news, index, lstNews[index], context);
-                    },
-                    options: CarouselOptions(
-                        disableCenter: true,
-                        height: MediaQuery.of(context).size.height / 4,
-                        autoPlay: true,
-                        enableInfiniteScroll: false,
-                        autoPlayAnimationDuration: const Duration(seconds: 1),
-                        enlargeCenterPage: true,
-                        onPageChanged: (index, reason) =>
-                            setState(() => activeIndex = index))),
-                const SizedBox(height: 12),
-                buildIndicator(),
-                Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      children: [
-                        titleCategory("Thời sự"),
-                        newsCard(context, lstNews_ThoiSu[0]),
-                        titleCategory("Thể thao"),
-                        newsCard(context, lstNews_TheThao[0]),
-                        titleCategory("Giáo dục"),
-                        newsCard(context, lstNews_GiaoDuc[0]),
-                        titleCategory("Nghệ thuật"),
-                        newsCard(context, lstNews_NgheThuat[0]),
-                      ],
-                    )),
-                const Divider(),
-                const SizedBox(
-                  width: double.infinity,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10, top: 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.phone,
-                              size: 20,
-                            ),
-                            Text(
-                              "Điện thoại: ",
-                              style: TextStyle(fontSize: 10),
-                            ),
-                            Text(
-                              "0938523503",
-                              style: TextStyle(color: Colors.red, fontSize: 10),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.location_on),
-                            Text(
-                              "Địa chỉ: ",
-                              style: TextStyle(fontSize: 10),
-                            ),
-                            Expanded(
-                                child: Text(
-                              "65 Huỳnh Thúc Kháng, Quận 1, TP Hồ Chí Minh",
-                              style: TextStyle(fontSize: 10),
-                            ))
-                          ],
-                        ),
-                        Text(
-                          "Tổng biên tập: Lê Hữu Thành",
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        Text(
-                          "Phó tổng biên tập: Bùi Thanh Viên",
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        Text(
-                          "Phó tổng biên tập: Bạch Anh Tiến",
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        Text(
-                          "Phó tổng biên tập: Phạm Ngọc Liêm",
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        SizedBox(
-                          height: 7,
-                        ),
-                        Text(
-                          "Cấm sao chép với mọi hình thức nếu không có sự chấp thuận bằng văn bản",
-                          style: TextStyle(fontSize: 10),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ]),
-            ),
-            bottomNavigationBar: const BottomNav(
-              idx: 0,
-            )),
-      );
-    }
-  }
-
-  ListTile newsCard(BuildContext context, News news) {
-    return ListTile(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CategoryDetailView(news: news)));
-      },
-      title: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.grey.shade200,
-        ),
-        width: double.infinity,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 100,
-              height: 100,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Image.network(
-                  news.img,
-                  fit: BoxFit.cover,
+              const ListTile(
+                title: Text(
+                  'Chuyên mục',
+                  style: TextStyle(fontSize: 10),
                 ),
               ),
+              ListTile(
+                  onTap: () {},
+                  title: Container(
+                    alignment: Alignment.topLeft,
+                    decoration: const BoxDecoration(
+                        border:
+                            Border(bottom: BorderSide(color: Colors.black))),
+                    child: const Text(
+                      "Trang chủ",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  )),
+              ListTile(
+                onTap: () {
+                  setState(() {
+                    onTap_ThoiSu = !onTap_ThoiSu;
+                  });
+                },
+                title: Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.topLeft,
+                      decoration: const BoxDecoration(
+                          border:
+                              Border(bottom: BorderSide(color: Colors.black))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Thời sự",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          Icon(
+                            onTap_ThoiSu
+                                ? Icons.keyboard_arrow_down_outlined
+                                : Icons.keyboard_arrow_up_outlined,
+                            size: 35,
+                            color: Colors.black,
+                          )
+                        ],
+                      ),
+                    ),
+                    if (onTap_ThoiSu)
+                      SizedBox(
+                        child: Column(children: [
+                          ListTile(
+                            onTap: () {},
+                            title: Container(
+                              alignment: Alignment.topLeft,
+                              decoration: const BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(color: Colors.black))),
+                              child: const Text(
+                                "Tin mới nhất",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 10),
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            title: Container(
+                              alignment: Alignment.topLeft,
+                              decoration: const BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(color: Colors.black))),
+                              child: const Text(
+                                "Ảnh / Video",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 10),
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            title: Container(
+                              alignment: Alignment.topLeft,
+                              decoration: const BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(color: Colors.black))),
+                              child: const Text(
+                                "Xem nhiều",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 10),
+                              ),
+                            ),
+                          ),
+                        ]),
+                      )
+                  ],
+                ),
+              ),
+              ListTile(
+                  onTap: () {
+                    setState(() {
+                      onTap_TheThao = !onTap_TheThao;
+                    });
+                  },
+                  title: Column(
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(color: Colors.black))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Thể thao",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            Icon(
+                              onTap_TheThao
+                                  ? Icons.keyboard_arrow_down_outlined
+                                  : Icons.keyboard_arrow_up_outlined,
+                              size: 35,
+                              color: Colors.black,
+                            )
+                          ],
+                        ),
+                      ),
+                      if (onTap_TheThao)
+                        SizedBox(
+                          child: Column(children: [
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Tin mới nhất",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Ảnh / Video",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Xem nhiều",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                          ]),
+                        )
+                    ],
+                  )),
+              ListTile(
+                  onTap: () {
+                    setState(() {
+                      onTap_NgheThuat = !onTap_NgheThuat;
+                    });
+                  },
+                  title: Column(
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(color: Colors.black))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Nghệ thuật",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            Icon(
+                              onTap_NgheThuat
+                                  ? Icons.keyboard_arrow_down_outlined
+                                  : Icons.keyboard_arrow_up_outlined,
+                              size: 35,
+                              color: Colors.black,
+                            )
+                          ],
+                        ),
+                      ),
+                      if (onTap_NgheThuat)
+                        SizedBox(
+                          child: Column(children: [
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Tin mới nhất",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Ảnh / Video",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Xem nhiều",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                          ]),
+                        )
+                    ],
+                  )),
+              ListTile(
+                  onTap: () {
+                    setState(() {
+                      onTap_GiaoDuc = !onTap_GiaoDuc;
+                    });
+                  },
+                  title: Column(
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(color: Colors.black))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Giáo dục",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            Icon(
+                              onTap_GiaoDuc
+                                  ? Icons.keyboard_arrow_down_outlined
+                                  : Icons.keyboard_arrow_up_outlined,
+                              size: 35,
+                              color: Colors.black,
+                            )
+                          ],
+                        ),
+                      ),
+                      if (onTap_GiaoDuc)
+                        SizedBox(
+                          child: Column(children: [
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Tin mới nhất",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Ảnh / Video",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              title: Container(
+                                alignment: Alignment.topLeft,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom:
+                                            BorderSide(color: Colors.black))),
+                                child: const Text(
+                                  "Xem nhiều",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                          ]),
+                        )
+                    ],
+                  )),
+            ],
+          ),
+        ),
+        body: SingleChildScrollView(
+          child: Column(children: [
+            Container(
+              margin: const EdgeInsets.only(left: 10.0),
+              height: 70,
+              child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    return CategoryTile(
+                      image: categories[index].image,
+                      categoryName: categories[index].categoryName,
+                    );
+                  }),
             ),
-            Expanded(
+            const SizedBox(
+              height: 20,
+            ),
+            CarouselSlider.builder(
+                carouselController: controller,
+                itemCount: lstNews.length,
+                itemBuilder: (context, index, realIndex) {
+                  final news = lstNews[index].img;
+                  return buildImage(news, index, lstNews[index].title);
+                },
+                options: CarouselOptions(
+                    disableCenter: true,
+                    height: MediaQuery.of(context).size.height / 4,
+                    autoPlay: true,
+                    enableInfiniteScroll: false,
+                    autoPlayAnimationDuration: const Duration(seconds: 1),
+                    enlargeCenterPage: true,
+                    onPageChanged: (index, reason) =>
+                        setState(() => activeIndex = index))),
+            const SizedBox(height: 12),
+            buildIndicator(),
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: Column(
+                  children: [
+                    titleCategory("Thời sự"),
+                    newsCard(context, lstNews[0].title, lstNews[0].content,
+                        lstNews[0].img),
+                    titleCategory("Thể thao"),
+                    newsCard(context, lstNews[1].title, lstNews[1].content,
+                        lstNews[1].img),
+                    titleCategory("Giáo dục"),
+                    newsCard(context, lstNews[2].title, lstNews[2].content,
+                        lstNews[2].img),
+                    titleCategory("Nghệ thuật"),
+                    newsCard(context, lstNews[3].title, lstNews[3].content,
+                        lstNews[3].img),
+                  ],
+                )),
+            const Divider(),
+            const SizedBox(
+              width: double.infinity,
               child: Padding(
-                padding: const EdgeInsets.only(left: 5.0),
+                padding: EdgeInsets.only(left: 10, top: 5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      news.title,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.phone,
+                          size: 20,
+                        ),
+                        Text(
+                          "Điện thoại: ",
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        Text(
+                          "0938523503",
+                          style: TextStyle(color: Colors.red, fontSize: 10),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on),
+                        Text(
+                          "Địa chỉ: ",
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        Expanded(
+                            child: Text(
+                          "65 Huỳnh Thúc Kháng, Quận 1, TP Hồ Chí Minh",
+                          style: TextStyle(fontSize: 10),
+                        ))
+                      ],
                     ),
                     Text(
-                      news.description,
-                      style: const TextStyle(
-                        fontSize: 8,
-                      ),
-                    )
+                      "Tổng biên tập: Lê Hữu Thành",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Text(
+                      "Phó tổng biên tập: Bùi Thanh Viên",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Text(
+                      "Phó tổng biên tập: Bạch Anh Tiến",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Text(
+                      "Phó tổng biên tập: Phạm Ngọc Liêm",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    SizedBox(
+                      height: 7,
+                    ),
+                    Text(
+                      "Cấm sao chép với mọi hình thức nếu không có sự chấp thuận bằng văn bản",
+                      style: TextStyle(fontSize: 10),
+                    ),
                   ],
                 ),
               ),
             )
+          ]),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.grey.shade300,
+          currentIndex: 0,
+          items: [
+            const BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.home,
+                  size: 30,
+                ),
+                label: 'Trang chủ'),
+            const BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.notifications,
+                  size: 30,
+                ),
+                label: 'Thông báo'),
+            BottomNavigationBarItem(
+                icon: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(50)),
+                  child: Image.asset(
+                    "assets/image/vien.jpg",
+                    fit: BoxFit.cover,
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+                label: 'Cá nhân'),
           ],
         ),
+      ),
+    );
+  }
+
+  Container newsCard(
+      BuildContext context, String title, String content, String img) {
+    return Container(
+      color: Colors.grey.shade200,
+      width: double.infinity,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 100,
+            height: 100,
+            child: Image.network(
+              img,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 5.0),
+              child: Column(
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    content,
+                    style: const TextStyle(
+                      fontSize: 8,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -386,17 +765,17 @@ class _HomeViewState extends State<HomeView> {
 
   int activeIndex = 0;
 
-  final controller = CarouselController();
+  // final controller = CarouselController();
 
-  Widget buildIndicator() => AnimatedSmoothIndicator(
-        onDotClicked: animateToSlide,
-        effect: const ExpandingDotsEffect(
-            dotWidth: 15, activeDotColor: Colors.black),
-        activeIndex: activeIndex,
-        count: lstNews.length,
-      );
+  // Widget buildIndicator() => AnimatedSmoothIndicator(
+  //       onDotClicked: animateToSlide,
+  //       effect: const ExpandingDotsEffect(
+  //           dotWidth: 15, activeDotColor: Colors.black),
+  //       activeIndex: activeIndex,
+  //       count: lstNews.length,
+  //     );
 
-  void animateToSlide(int index) => controller.animateToPage(index);
+  // void animateToSlide(int index) => controller.animateToPage(index);
 }
 
 Widget buildImage(
