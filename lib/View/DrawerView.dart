@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Repository/NewsRepository.dart';
+import 'package:news_app/View/CategoryNewView.dart';
+import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/HomeView.dart';
 
 import '../Model/News.dart';
@@ -113,50 +116,7 @@ class _DrawerViewState extends State<DrawerView> {
                     ],
                   ),
                 ),
-                if (onTap_ThoiSu)
-                  SizedBox(
-                    child: Column(children: [
-                      ListTile(
-                        onTap: () {},
-                        title: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black))),
-                          child: const Text(
-                            "Tin mới nhất",
-                            style: TextStyle(color: Colors.black, fontSize: 10),
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        onTap: () {},
-                        title: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black))),
-                          child: const Text(
-                            "Ảnh / Video",
-                            style: TextStyle(color: Colors.black, fontSize: 10),
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        onTap: () {},
-                        title: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black))),
-                          child: const Text(
-                            "Xem nhiều",
-                            style: TextStyle(color: Colors.black, fontSize: 10),
-                          ),
-                        ),
-                      ),
-                    ]),
-                  )
+                if (onTap_ThoiSu) selectMethod("Thời sự")
               ],
             ),
           ),
@@ -192,53 +152,7 @@ class _DrawerViewState extends State<DrawerView> {
                       ],
                     ),
                   ),
-                  if (onTap_TheThao)
-                    SizedBox(
-                      child: Column(children: [
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Tin mới nhất",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Ảnh / Video",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Xem nhiều",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    )
+                  if (onTap_TheThao) selectMethod("Thể thao")
                 ],
               )),
           ListTile(
@@ -273,53 +187,7 @@ class _DrawerViewState extends State<DrawerView> {
                       ],
                     ),
                   ),
-                  if (onTap_NgheThuat)
-                    SizedBox(
-                      child: Column(children: [
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Tin mới nhất",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Ảnh / Video",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Xem nhiều",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    )
+                  if (onTap_NgheThuat) selectMethod("Nghệ thuật")
                 ],
               )),
           ListTile(
@@ -354,57 +222,84 @@ class _DrawerViewState extends State<DrawerView> {
                       ],
                     ),
                   ),
-                  if (onTap_GiaoDuc)
-                    SizedBox(
-                      child: Column(children: [
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Tin mới nhất",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Ảnh / Video",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          title: Container(
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.black))),
-                            child: const Text(
-                              "Xem nhiều",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    )
+                  if (onTap_GiaoDuc) selectMethod("Giáo dục")
                 ],
               )),
         ],
       ),
+    );
+  }
+
+  SizedBox selectMethod(String name) {
+    return SizedBox(
+      child: Column(children: [
+        ListTile(
+          onTap: () {
+            if (name == "Thời sự") {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_ThoiSu[0],
+                      )));
+            } else if (name == "Thể thao") {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_TheThao[0],
+                      )));
+            } else if (name == "Giáo dục") {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_GiaoDuc[0],
+                      )));
+            } else {
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CategoryNewView(
+                        news: NewsRepository.lstNews_NgheThuat[0],
+                      )));
+            }
+          },
+          title: Container(
+            alignment: Alignment.topLeft,
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black))),
+            child: const Text(
+              "Tin mới nhất",
+              style: TextStyle(color: Colors.black, fontSize: 10),
+            ),
+          ),
+        ),
+        ListTile(
+          onTap: () {},
+          title: Container(
+            alignment: Alignment.topLeft,
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black))),
+            child: const Text(
+              "Ảnh / Video",
+              style: TextStyle(color: Colors.black, fontSize: 10),
+            ),
+          ),
+        ),
+        ListTile(
+          onTap: () {
+            Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => CategoryView(name: name)));
+          },
+          title: Container(
+            alignment: Alignment.topLeft,
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black))),
+            child: const Text(
+              "Xem nhiều",
+              style: TextStyle(color: Colors.black, fontSize: 10),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }

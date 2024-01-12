@@ -8,6 +8,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../Model/News.dart';
 import '../Presenter/NewsPresenter.dart';
+import 'CategoryDetailView.dart';
 import 'NavigationBarView.dart';
 
 class CategoryView extends StatefulWidget {
@@ -18,11 +19,11 @@ class CategoryView extends StatefulWidget {
 }
 
 List<News> lstNews_New = List.filled(
-    0, News(title: "", content: "", img: "", link: ""),
+    0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
     growable: true);
 
 List<News> lstNews = List.filled(
-    0, News(title: "", content: "", img: "", link: ""),
+    0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
     growable: true);
 bool shorten = false;
 
@@ -38,7 +39,9 @@ class _CategoryViewState extends State<CategoryView> {
     if (name != widget.name) {
       print("new");
       name = widget.name;
-      lstNews = List.filled(0, News(title: "", content: "", img: "", link: ""),
+
+      lstNews = List.filled(0,
+          News(title: "", description: "", img: "", urlHtml: "", category: ""),
           growable: true);
     }
     NewsPresenter.getNews().then((value) {
@@ -46,7 +49,11 @@ class _CategoryViewState extends State<CategoryView> {
         lstNews_New = NewsRepository.lstNews;
       });
     });
-    if (widget.name == "Thời sự") {
+    if (widget.name == "Tin mới") {
+      setState(() {
+        lstNews = NewsRepository.lstNews;
+      });
+    } else if (widget.name == "Thời sự") {
       NewsPresenter.getNews_ThoiSu().then((value) {
         setState(() {
           lstNews = NewsRepository.lstNews_ThoiSu;
@@ -130,7 +137,8 @@ class _CategoryViewState extends State<CategoryView> {
                     itemCount: lstNews_New.length,
                     itemBuilder: (context, index, realIndex) {
                       final news = lstNews_New[index].img;
-                      return buildImage(news, index, lstNews_New[index].title);
+                      return buildImage(
+                          news, index, lstNews_New[index], context);
                     },
                     options: CarouselOptions(
                         disableCenter: true,
@@ -270,35 +278,45 @@ Widget buildIndicator() => AnimatedSmoothIndicator(
       count: lstNews_New.length,
     );
 
-Widget buildImage(String assetImage, int index, String title) =>
-    Stack(children: [
-      SizedBox(
-        width: double.infinity,
-        child: ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-            child: Image.network(assetImage, fit: BoxFit.cover, scale: 10)),
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 70,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: Colors.black38,
+Widget buildImage(
+        String assetImage, int index, News news, BuildContext context) =>
+    ListTile(
+      onTap: () {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CategoryDetailView(
+                  news: news,
+                )));
+      },
+      title: Stack(children: [
+        SizedBox(
+          width: double.infinity,
+          child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              child: Image.network(assetImage, fit: BoxFit.fill, scale: 10)),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              width: double.infinity,
+              height: 70,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: Colors.black38,
+              ),
+              child: Text(
+                news.title,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
-            child: Text(
-              title,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      )
-    ]);
+          ],
+        )
+      ]),
+    );
 
 class CategoryTile extends StatelessWidget {
   final image, categoryName;
@@ -377,7 +395,10 @@ Row titleCategory(String name) {
 
 ListTile newsCard(BuildContext context, News news) {
   return ListTile(
-    onTap: () {},
+    onTap: () {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CategoryDetailView(news: news)));
+    },
     title: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -401,6 +422,7 @@ ListTile newsCard(BuildContext context, News news) {
             child: Padding(
               padding: const EdgeInsets.only(left: 5.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     news.title,
@@ -410,7 +432,7 @@ ListTile newsCard(BuildContext context, News news) {
                     ),
                   ),
                   Text(
-                    news.content,
+                    news.description,
                     style: const TextStyle(
                       fontSize: 8,
                     ),
