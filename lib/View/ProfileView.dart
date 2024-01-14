@@ -13,8 +13,6 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-
-
   bool isShowName = false;
   bool isShowEmail = false;
   bool isShowPass = false;
@@ -35,11 +33,19 @@ class _ProfileViewState extends State<ProfileView> {
   String phoneError = '';
   String birthError = '';
 
-   bool _isValidEmail(String email) {
+  bool _isValidEmail(String email) {
     // Biểu thức chính quy để kiểm tra định dạng email
     const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
     final regex = RegExp(pattern);
     return regex.hasMatch(email);
+  }
+
+  bool _isValidPhone(String phone) {
+    // Biểu thức chính quy để kiểm tra định dạng số điện thoại
+    const pattern =
+        r'^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(phone);
   }
 
   @override
@@ -127,7 +133,17 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
                         onPressed: () async {
-                          setState(() {});
+                          setState(() {
+                            final accountName = name.text.trim();
+                            if (accountName.isEmpty) {
+                              nameError = 'Tên tài khoản không được bỏ trống';
+                            } else if (accountName.length < 8) {
+                              nameError = 'Tên tài khoản phải tối đa 8 kí tự';
+                            } else {
+                              nameError = '';
+                              isShowName = !isShowName;
+                            }
+                          });
                         },
                         child: const Text("Lưu thay đổi"),
                       )
@@ -179,7 +195,17 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
                           onPressed: () async {
-                            setState(() {});
+                            setState(() {
+                              final accountEmail = email.text.trim();
+                              if (accountEmail.isEmpty) {
+                                emailError = 'Email không được bỏ trống';
+                              } else if (!_isValidEmail(accountEmail)) {
+                                emailError = 'Email không hợp lệ';
+                              } else {
+                                emailError = '';
+                                isShowEmail = !isShowEmail;
+                              }
+                            });
                           },
                           child: const Text("Lưu thay đổi"))
                     ],
@@ -208,6 +234,7 @@ class _ProfileViewState extends State<ProfileView> {
                         borderRadius: BorderRadius.circular(15))),
                 obscureText: isShowPass,
                 obscuringCharacter: '*',
+                readOnly: true,
               ),
               const Text("Thông tin cá nhân"),
               ListTile(
@@ -251,7 +278,19 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            final accountPhone = phone.text.trim();
+                            if (accountPhone.isEmpty) {
+                              phoneError = 'Số điện thoại không được bỏ trống';
+                            } else if (!_isValidPhone(accountPhone)) {
+                              phoneError = 'Số điện thoại không hợp lệ';
+                            } else {
+                              phoneError = '';
+                              isShowPhoneNum = !isShowPhoneNum;
+                            }
+                          });
+                        },
                         child: const Text("Lưu thay đổi"),
                       )
                     ],
@@ -299,7 +338,10 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
-                          onPressed: () {}, child: const Text("Lưu thay đổi"))
+                          onPressed: () {
+                            setState(() {});
+                          },
+                          child: const Text("Lưu thay đổi"))
                     ],
                   ),
                 ),
@@ -339,7 +381,8 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                         controller: birth,
                         decoration: InputDecoration(
-                          errorText: birthError.isNotEmpty?birthError:null,
+                            errorText:
+                                birthError.isNotEmpty ? birthError : null,
                             filled: true,
                             fillColor: Colors.grey[350],
                             border: OutlineInputBorder(
@@ -369,6 +412,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 birthError = 'Vui lòng chọn ngày sinh';
                               } else {
                                 birthError = '';
+                                isShowBirth = !isShowBirth;
                               }
                             });
                           },
