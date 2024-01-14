@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -9,6 +10,7 @@ import 'package:news_app/Model/News.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
+import 'package:news_app/View/LoginView.dart';
 import 'package:sizer/sizer.dart';
 
 class CategoryDetailView extends StatefulWidget {
@@ -21,9 +23,15 @@ class CategoryDetailView extends StatefulWidget {
   State<CategoryDetailView> createState() => _CategoryDetailViewState();
 }
 
+final FirebaseAuth auth = FirebaseAuth.instance;
+// String? name = FirebaseAuth.instance.currentUser!.displayName;
+// String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
+User? _currentUser = auth.currentUser;
+
 class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
   int count = 0;
+
   // void removeContainer(int index) {
   //   setState(() {
   //     widgetList.removeAt(index);
@@ -185,19 +193,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     fetchData();
   }
 
-  String url =
-      'https://vnexpress.net/chinh-phu-doc-thuc-van-hanh-metro-nhon-ga-ha-noi-va-ben-thanh-suoi-tien-4698264.html';
+  // String url =
+  //     'https://vnexpress.net/chinh-phu-doc-thuc-van-hanh-metro-nhon-ga-ha-noi-va-ben-thanh-suoi-tien-4698264.html';
 
-  Future<void> fetchHtmlContent() async {
-    http.Response response = await http.get(Uri.parse(url));
+  // Future<void> fetchHtmlContent() async {
+  //   http.Response response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      String htmlContent = response.body;
-      print(htmlContent); // In ra đoạn mã HTML
-    } else {
-      print('Lỗi: ${response.statusCode}');
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     String htmlContent = response.body;
+  //     print(htmlContent); // In ra đoạn mã HTML
+  //   } else {
+  //     print('Lỗi: ${response.statusCode}');
+  //   }
+  // }
 
   Future<void> fetchData() async {
     try {
@@ -326,9 +334,13 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                   int index = test1.length > count ? count++ : test1.length - 1;
                   return index.isEven
                       ? Html(data: test1[index])
-                      : Image.network(imageUrls[imageUrls.length > count1
-                          ? count1++
-                          : imageUrls.length - 1]);
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.network(imageUrls[
+                              imageUrls.length > count1
+                                  ? count1++
+                                  : imageUrls.length - 1]),
+                        );
                 }).toList(),
               ),
               const SizedBox(
@@ -355,36 +367,75 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         hintText: 'Bình luận của bạn...',
                         suffixIcon: IconButton(
                             onPressed: () {
-                              if (cmt.text.isNotEmpty) {
-                                CommentRepository.addComment(Comment(
-                                    content: cmt.text,
-                                    email: "12344@gmail.com",
-                                    like: true,
-                                    time: DateTime.now().toString(),
-                                    nameUser: "abc",
-                                    title: widget.news.title,
-                                    delete: true));
-                                addComment();
-                              } else {
+                              if (_currentUser == null) {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
                                       title: const Text('Thông báo'),
-                                      content:
-                                          const Text('Vui lòng nhập bình luận'),
+                                      content: const Text(
+                                          'Vui lòng đăng nhập để bình luận'),
                                       actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            // Đóng hộp thoại khi người dùng nhấn nút
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text('Đóng'),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                Navigator.of(context).pop();
+                                                cmt.clear();
+                                              },
+                                              child: Text('Đóng'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const LoginView()));
+                                              },
+                                              child: Text('Đăng nhập'),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     );
                                   },
                                 );
+                              } else {
+                                if (cmt.text.isNotEmpty) {
+                                  CommentRepository.addComment(Comment(
+                                      content: cmt.text,
+                                      email: "12344@gmail.com",
+                                      like: true,
+                                      time: DateTime.now().toString(),
+                                      nameUser: "abc",
+                                      title: widget.news.title,
+                                      delete: true));
+                                  addComment();
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Thông báo'),
+                                        content: const Text(
+                                            'Vui lòng nhập bình luận'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              // Đóng hộp thoại khi người dùng nhấn nút
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Đóng'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
                               }
                             },
                             icon: const Icon(Icons.send)))),
