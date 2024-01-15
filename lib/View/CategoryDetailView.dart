@@ -396,7 +396,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                                         builder: (context) =>
                                                             const LoginView()));
                                               },
-                                              child: Text('Đăng nhập'),
+                                              child: const Text('Đăng nhập'),
                                             ),
                                           ],
                                         ),

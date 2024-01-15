@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Model/User.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'LoginView.dart';
 
 class SignupView extends StatefulWidget {
@@ -29,7 +32,6 @@ class _SignupViewState extends State<SignupView> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (userCredential != null) {}
     } catch (e) {
       // Xử lý lỗi
       print(e.toString());
@@ -348,6 +350,13 @@ class _SignupViewState extends State<SignupView> {
                         _repasswordError.isEmpty &&
                         _emailError.isEmpty) {
                       signup();
+                      UserRepository.setUser(Users(
+                          name: _accountNameController.text,
+                          password: _passwordController.text,
+                          email: _emailController.text,
+                          birth: DateTime(0),
+                          phone: "",
+                          gender: true));
                       _showSuccessDialog(context);
                     } else {
                       _showFailedDialog(context);

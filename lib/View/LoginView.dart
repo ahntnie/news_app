@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/View/ProfileView.dart';
 import 'package:news_app/View/SignupView.dart';
 
 class LoginView extends StatefulWidget {
@@ -372,7 +373,8 @@ class _LoginViewState extends State<LoginView> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ProfileView()));
               },
               child: const Text('Đóng'),
             ),

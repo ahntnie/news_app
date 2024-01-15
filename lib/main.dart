@@ -5,9 +5,12 @@ import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/DrawerView.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/StartView.dart';
-import 'package:news_app/View/UserView.dart';
+// import 'package:news_app/View/UserView.dart';
+// import 'package:news_app/forgetpassword.dart';
+// import 'package:news_app/loginscreen.dart';
+// import 'package:news_app/signupscreen.dart';
 
-import 'View/CategoryView.dart';
+// import 'View/CategoryView.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -19,7 +22,13 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  Future<FirebaseApp> _initializeFirebase() async {
+    FirebaseApp firebaseApp = await Firebase.initializeApp();
+    return firebaseApp;
+  }
+
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

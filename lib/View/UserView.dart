@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../Model/User.dart';
 
 class UserView extends StatelessWidget {
-  final User user;
+  final Users user;
 
   const UserView({
     required this.user,
