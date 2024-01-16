@@ -16,7 +16,11 @@ class CommentRepository {
     };
     final ref2 = FirebaseDatabase.instance.ref().child("comment");
 
-    ref2.child(comment.title.toString()).push().set(_comment).then((value) {
+    ref2
+        .child(comment.title.toString())
+        .child(comment.nameUser.toString())
+        .set(_comment)
+        .then((value) {
       print("Thêm bình luận thành công");
     }).catchError((onError) {
       print('Thêm bình luận không thành công');
