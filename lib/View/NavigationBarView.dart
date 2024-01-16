@@ -69,6 +69,7 @@ class _BottomNavState extends State<BottomNav> {
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
+            print(_currentUser!.displayName);
             _currentUser == null
                 ? Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const LoginView()))
