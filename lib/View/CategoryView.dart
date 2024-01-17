@@ -1,13 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/DrawerView.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../Model/Category.dart';
 import '../Model/News.dart';
 import '../Presenter/NewsPresenter.dart';
 import 'CategoryDetailView.dart';
@@ -41,6 +39,7 @@ class _CategoryViewState extends State<CategoryView> {
     if (name != widget.name) {
       print("new");
       name = widget.name;
+
       lstNews = List.filled(0,
           News(title: "", description: "", img: "", urlHtml: "", category: ""),
           growable: true);

@@ -1,12 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
+import 'package:news_app/View/LoginView.dart';
+import 'package:sizer/sizer.dart';
 
 class CategoryDetailView extends StatefulWidget {
   const CategoryDetailView({
@@ -18,7 +23,162 @@ class CategoryDetailView extends StatefulWidget {
   State<CategoryDetailView> createState() => _CategoryDetailViewState();
 }
 
+final FirebaseAuth auth = FirebaseAuth.instance;
+// String? name = FirebaseAuth.instance.currentUser!.displayName;
+// String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
+User? _currentUser = auth.currentUser;
+
 class _CategoryDetailViewState extends State<CategoryDetailView> {
+  List<Widget> lstComment = [];
+  int count = 0;
+
+  // void removeContainer(int index) {
+  //   setState(() {
+  //     widgetList.removeAt(index);
+  //   });
+  // }
+  // void _incrementCount() {
+  //   setState(() {
+  //     if (count == 0) {
+  //       count = 1;
+  //     } else {
+  //       count = 0;
+  //     }
+  //   });
+  // }
+
+  // void _decrementCount() {
+  //   setState(() {
+  //     if (count == 0) {
+  //       count = 1;
+  //     } else {
+  //       count = 0;
+  //     }
+  //   });
+  // }
+
+  void addComment() {
+    setState(() {
+      lstComment.add(
+        Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.grey.shade300,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            width: 350,
+            constraints: const BoxConstraints(
+              minHeight: 100.0,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      // height: 80,
+                      decoration: const BoxDecoration(),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 40, left: 10),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(50)),
+                                  child: Image.asset(
+                                    "assets/image/vien.jpg",
+                                    fit: BoxFit.cover,
+                                    height: 40,
+                                    width: 40,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(left: 10),
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                        "abc@gmail.com",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                          "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}  ${DateTime.now().hour}:${DateTime.now().minute}")
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        cmt.text,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+              ],
+            )),
+      );
+
+      lstComment.add(Container(
+        margin: const EdgeInsets.only(left: 30, right: 30),
+        child: Row(
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    // _incrementCount();
+                    // print(count);
+                  },
+                  icon: const Icon(Icons.thumb_up),
+                ),
+                // Text("${count}")
+              ],
+            ),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    // _decrementCount();
+                    // print(count);
+                  },
+                  icon: const Icon(Icons.thumb_down),
+                ),
+                // Text("${count}")
+              ],
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            InkWell(
+              onTap: () {},
+              child: Text(
+                "Trả lời",
+                style: TextStyle(color: Colors.blue.shade400),
+              ),
+            ),
+          ],
+        ),
+      ));
+    });
+  }
+
+  int minHeightt = 10;
+  int minHeight = 100;
   final cmt = TextEditingController();
   String gmtt = "";
   List<String> descriptions = [];
@@ -33,19 +193,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     fetchData();
   }
 
-  String url =
-      'https://vnexpress.net/chinh-phu-doc-thuc-van-hanh-metro-nhon-ga-ha-noi-va-ben-thanh-suoi-tien-4698264.html';
+  // String url =
+  //     'https://vnexpress.net/chinh-phu-doc-thuc-van-hanh-metro-nhon-ga-ha-noi-va-ben-thanh-suoi-tien-4698264.html';
 
-  Future<void> fetchHtmlContent() async {
-    http.Response response = await http.get(Uri.parse(url));
+  // Future<void> fetchHtmlContent() async {
+  //   http.Response response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      String htmlContent = response.body;
-      print(htmlContent); // In ra đoạn mã HTML
-    } else {
-      print('Lỗi: ${response.statusCode}');
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     String htmlContent = response.body;
+  //     print(htmlContent); // In ra đoạn mã HTML
+  //   } else {
+  //     print('Lỗi: ${response.statusCode}');
+  //   }
+  // }
 
   Future<void> fetchData() async {
     try {
@@ -166,7 +326,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              
               const SizedBox(
                 height: 10,
               ),
@@ -175,9 +334,13 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                   int index = test1.length > count ? count++ : test1.length - 1;
                   return index.isEven
                       ? Html(data: test1[index])
-                      : Image.network(imageUrls[imageUrls.length > count1
-                          ? count1++
-                          : imageUrls.length - 1]);
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.network(imageUrls[
+                              imageUrls.length > count1
+                                  ? count1++
+                                  : imageUrls.length - 1]),
+                        );
                 }).toList(),
               ),
               const SizedBox(
@@ -193,7 +356,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
               ),
               Container(
                 // margin: const EdgeInsets.only(top: 30),
-
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: TextFormField(
                     maxLines: null,
@@ -204,52 +366,89 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                 BorderRadius.all(Radius.circular(20))),
                         hintText: 'Bình luận của bạn...',
                         suffixIcon: IconButton(
-                            onPressed: () {}, icon: const Icon(Icons.send)))),
+                            onPressed: () {
+                              if (_currentUser == null) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Thông báo'),
+                                      content: const Text(
+                                          'Vui lòng đăng nhập để bình luận'),
+                                      actions: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                Navigator.of(context).pop();
+                                                cmt.clear();
+                                              },
+                                              child: Text('Đóng'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const LoginView()));
+                                              },
+                                              child: const Text('Đăng nhập'),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                if (cmt.text.isNotEmpty) {
+                                  CommentRepository.addComment(Comment(
+                                      content: cmt.text,
+                                      email: "12344@gmail.com",
+                                      like: true,
+                                      time: DateTime.now().toString(),
+                                      nameUser: "abc",
+                                      title: widget.news.title,
+                                      delete: true));
+                                  addComment();
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Thông báo'),
+                                        content: const Text(
+                                            'Vui lòng nhập bình luận'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              // Đóng hộp thoại khi người dùng nhấn nút
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Đóng'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.send)))),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Column(
+                children: lstComment,
               ),
               const SizedBox(
                 height: 10,
               ),
-              Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey.shade300,
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  width: 350,
-                  constraints: const BoxConstraints(
-                    minHeight: 100.0,
-                    maxHeight: 1000.0,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 70,
-                        height: 80,
-                        decoration: const BoxDecoration(),
-                      ),
-                    ],
-                  )),
-              Container(
-                margin: const EdgeInsets.only(left: 30, right: 30),
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.thumb_up)),
-                    IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.thumb_down)),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    InkWell(
-                      onTap: () {},
-                      child: Text(
-                        "Trả lời",
-                        style: TextStyle(color: Colors.blue.shade400),
-                      ),
-                    )
-                  ],
-                ),
-              )
             ],
           ),
         ),

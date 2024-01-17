@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
+import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 
 class ProfileView extends StatefulWidget {
@@ -26,6 +29,26 @@ class _ProfileViewState extends State<ProfileView> {
   TextEditingController phone = TextEditingController();
   TextEditingController gender = TextEditingController();
   TextEditingController birth = TextEditingController();
+  String nameError = '';
+  String emailError = '';
+  String passwordError = '';
+  String phoneError = '';
+  String birthError = '';
+
+  bool _isValidEmail(String email) {
+    // Biểu thức chính quy để kiểm tra định dạng email
+    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
+  bool _isValidPhone(String phone) {
+    // Biểu thức chính quy để kiểm tra định dạng số điện thoại
+    const pattern =
+        r'^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(phone);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +75,15 @@ class _ProfileViewState extends State<ProfileView> {
                   ]),
                   Column(
                     children: [
-                      const Text("Nguyễn Văn A"),
+                      const Text(
+                        "userName",
+                        style: const TextStyle(color: Colors.black),
+                      ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const LoginView()));
+                        },
                         child: const Text(
                           "Đăng xuất",
                           style: TextStyle(color: Colors.black),
@@ -103,13 +132,27 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                           controller: name,
                           decoration: InputDecoration(
+                              errorText:
+                                  nameError.isNotEmpty ? nameError : null,
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          setState(() {
+                            final accountName = name.text.trim();
+                            if (accountName.isEmpty) {
+                              nameError = 'Tên tài khoản không được bỏ trống';
+                            } else if (accountName.length < 8) {
+                              nameError = 'Tên tài khoản phải tối đa 8 kí tự';
+                            } else {
+                              nameError = '';
+                              isShowName = !isShowName;
+                            }
+                          });
+                        },
                         child: const Text("Lưu thay đổi"),
                       )
                     ],
@@ -151,13 +194,28 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                           controller: email,
                           decoration: InputDecoration(
+                              errorText:
+                                  emailError.isNotEmpty ? emailError : null,
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
-                          onPressed: () {}, child: const Text("Lưu thay đổi"))
+                          onPressed: () async {
+                            setState(() {
+                              final accountEmail = email.text.trim();
+                              if (accountEmail.isEmpty) {
+                                emailError = 'Email không được bỏ trống';
+                              } else if (!_isValidEmail(accountEmail)) {
+                                emailError = 'Email không hợp lệ';
+                              } else {
+                                emailError = '';
+                                isShowEmail = !isShowEmail;
+                              }
+                            });
+                          },
+                          child: const Text("Lưu thay đổi"))
                     ],
                   ),
                 ),
@@ -167,13 +225,24 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               TextField(
                 decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isShowPass = !isShowPass;
+                        });
+                      },
+                      icon: Icon(
+                        isShowPass ? Icons.visibility : Icons.visibility_off,
+                      ),
+                    ),
                     filled: true,
                     fillColor: Colors.grey[400],
                     border: OutlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.circular(15))),
-                obscureText: true,
+                obscureText: isShowPass,
                 obscuringCharacter: '*',
+                readOnly: true,
               ),
               const Text("Thông tin cá nhân"),
               ListTile(
@@ -217,7 +286,19 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            final accountPhone = phone.text.trim();
+                            if (accountPhone.isEmpty) {
+                              phoneError = 'Số điện thoại không được bỏ trống';
+                            } else if (!_isValidPhone(accountPhone)) {
+                              phoneError = 'Số điện thoại không hợp lệ';
+                            } else {
+                              phoneError = '';
+                              isShowPhoneNum = !isShowPhoneNum;
+                            }
+                          });
+                        },
                         child: const Text("Lưu thay đổi"),
                       )
                     ],
@@ -265,7 +346,10 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
-                          onPressed: () {}, child: const Text("Lưu thay đổi"))
+                          onPressed: () {
+                            setState(() {});
+                          },
+                          child: const Text("Lưu thay đổi"))
                     ],
                   ),
                 ),
@@ -305,6 +389,8 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                         controller: birth,
                         decoration: InputDecoration(
+                            errorText:
+                                birthError.isNotEmpty ? birthError : null,
                             filled: true,
                             fillColor: Colors.grey[350],
                             border: OutlineInputBorder(
@@ -327,7 +413,18 @@ class _ProfileViewState extends State<ProfileView> {
                         },
                       ),
                       ElevatedButton(
-                          onPressed: () {}, child: const Text("Lưu thay đổi"))
+                          onPressed: () async {
+                            setState(() {
+                              final accountBirthday = birth.text.trim();
+                              if (accountBirthday.isEmpty) {
+                                birthError = 'Vui lòng chọn ngày sinh';
+                              } else {
+                                birthError = '';
+                                isShowBirth = !isShowBirth;
+                              }
+                            });
+                          },
+                          child: const Text("Lưu thay đổi"))
                     ],
                   ),
                 ),

@@ -61,19 +61,19 @@ double size(BuildContext context, int baseSize) {
   return baseSize * (screenSize / baseScreenSize);
 }
 
-Future<void> PhatVideo() async {
-  final ref = FirebaseStorage.instance.ref('vidoe đồ án .mp4');
-  final url = await ref.getDownloadURL();
-  final controller = VideoPlayerController.networkUrl(Uri.parse(url));
-  controller.initialize();
-  controller.play();
-  video = Center(
-    child: AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: VideoPlayer(controller),
-    ),
-  );
-}
+// Future<void> PhatVideo() async {
+//   final ref = FirebaseStorage.instance.ref('vidoe đồ án .mp4');
+//   final url = await ref.getDownloadURL();
+//   final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+//   controller.initialize();
+//   controller.play();
+//   video = Center(
+//     child: AspectRatio(
+//       aspectRatio: controller.value.aspectRatio,
+//       child: VideoPlayer(controller),
+//     ),
+//   );
+// }
 
 class _HomeViewState extends State<HomeView> {
   // @override

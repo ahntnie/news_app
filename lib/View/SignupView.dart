@@ -1,7 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'DrawerView.dart';
 import 'HomeView.dart';
+
+import 'package:news_app/Model/User.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
+import 'package:news_app/Repository/UserRepository.dart';
+
 import 'LoginView.dart';
 import 'NavigationBarView.dart';
 
@@ -32,7 +38,6 @@ class _SignupViewState extends State<SignupView> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (userCredential != null) {}
     } catch (e) {
       // Xử lý lỗi
       print(e.toString());
@@ -326,40 +331,72 @@ class _SignupViewState extends State<SignupView> {
                 ),
               ),
               SizedBox(height: size(context, 5)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.blue.shade100)),
-                    onPressed: () async {
-                      validateAccountName();
-                      validatePassword();
-                      validateRepassword();
-                      validateEmail();
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.blue.shade100)),
+                  onPressed: () async {
+                    validateAccountName();
+                    validatePassword();
+                    validateRepassword();
+                    validateEmail();
 
-                      if (_accountNameError.isEmpty &&
-                          _accountPasswordError.isEmpty &&
-                          _repasswordError.isEmpty &&
-                          _emailError.isEmpty) {
-                        signup();
-                        _showSuccessDialog(context);
-                      } else {
-                        _showFailedDialog(context);
-                      }
-                    },
-                    child: const Text(
-                      "Đăng ký",
-                      style: TextStyle(color: Colors.black, fontSize: 18),
-                    ),
+                    if (_accountNameError.isEmpty &&
+                        _accountPasswordError.isEmpty &&
+                        _repasswordError.isEmpty &&
+                        _emailError.isEmpty) {
+                      signup();
+                      _showSuccessDialog(context);
+                    } else {
+                      _showFailedDialog(context);
+                    }
+                  },
+                  child: const Text(
+                    "Đăng ký",
+                    style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
-                ],
-              ),
-              SizedBox(
-                height: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.blue.shade100)),
+                  onPressed: () async {
+                    validateAccountName();
+                    validatePassword();
+                    validateRepassword();
+                    validateEmail();
+
+                    if (_accountNameError.isEmpty &&
+                        _accountPasswordError.isEmpty &&
+                        _repasswordError.isEmpty &&
+                        _emailError.isEmpty) {
+                      signup();
+                      UserRepository.setUser(Users(
+                          name: _accountNameController.text,
+                          password: _passwordController.text,
+                          email: _emailController.text,
+                          birth: DateTime(0),
+                          phone: "",
+                          gender: true));
+                      _showSuccessDialog(context);
+                    } else {
+                      _showFailedDialog(context);
+                    }
+                  },
+                  child: const Text(
+                    "Đăng ký",
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       "Bạn đã có tài khoản? ",
@@ -379,7 +416,7 @@ class _SignupViewState extends State<SignupView> {
                     )
                   ],
                 ),
-              ),
+              ]),
             ],
           ),
         ),
