@@ -22,15 +22,14 @@ Future<User?> signInWithGoogle() async {
   GoogleSignInAccount? googleSignInAccount;
 
   try {
-    googleSignInAccount =
-        await googleSignIn.signIn().catchError((onError) => null);
+    googleSignInAccount = await googleSignIn.signIn();
   } catch (e) {
     print("Không đăng nhập được!!!");
   }
 
   if (googleSignInAccount != null) {
     final GoogleSignInAuthentication googleAuth =
-        await googleSignInAccount!.authentication;
+        await googleSignInAccount.authentication;
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
@@ -44,8 +43,9 @@ Future<User?> signInWithGoogle() async {
       print('Tên Gmail của người dùng: $userName');
       return user;
     } on FirebaseAuthException catch (e) {
+      print("Lỗi xác thực Firebase: ${e.message}");
     } catch (e) {
-      // ...
+      print("Lỗi không xác định: $e");
     }
   }
   return null;

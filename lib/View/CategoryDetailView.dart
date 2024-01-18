@@ -434,7 +434,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                                 // Đóng hộp thoại khi người dùng nhấn nút
                                                 Navigator.of(context).pop();
                                               },
-                                              child: Text('Đóng'),
+                                              child: const Text('Đóng'),
                                             ),
                                           ],
                                         );
