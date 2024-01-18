@@ -2,6 +2,7 @@ import '../Model/User.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class UserRepository {
+  static Users? User = null;
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
     var _user = {

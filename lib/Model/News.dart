@@ -3,7 +3,6 @@ class News {
   String title;
   String description;
   String img;
-
   String urlHtml;
   News({
     required this.title,

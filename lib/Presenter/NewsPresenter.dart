@@ -22,4 +22,8 @@ class NewsPresenter {
   static Future<void> getNews_NgheThuat() async {
     return await NewsRepository.getNews_NgheThuat();
   }
+
+  static Future<void> searchNews(String string_news) async {
+    return await NewsRepository.searchNews(string_news);
+  }
 }

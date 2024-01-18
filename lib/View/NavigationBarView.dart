@@ -20,6 +20,19 @@ final FirebaseAuth auth = FirebaseAuth.instance;
 // String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
 var _currentUser = auth.currentUser;
 TextEditingController txt_RoomName = TextEditingController();
+Future<bool> checkLoginStatus(String email) async {
+  try {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password:
+          'password', // Đổi 'password' thành mật khẩu tương ứng với tài khoản
+    );
+    return true; // Tài khoản đã đăng nhập
+  } catch (e) {
+    return false; // Tài khoản chưa đăng nhập hoặc xảy ra lỗi
+  }
+}
 
 class _BottomNavState extends State<BottomNav> {
   @override
@@ -69,14 +82,19 @@ class _BottomNavState extends State<BottomNav> {
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
-            _currentUser == null
-                ? Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const LoginView()))
-                :
-
-                // Trang profile
+            String emailToCheck = '';
+            checkLoginStatus(emailToCheck).then((isLoggedIn) {
+              if (isLoggedIn) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const ProfileView()));
+              } else {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const LoginView()));
+              }
+            }).catchError((error) {
+              print('Lỗi kiểm tra trạng thái đăng nhập: $error');
+            });
+            // Trang profile
           }
         }
       },
