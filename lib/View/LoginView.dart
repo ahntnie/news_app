@@ -15,40 +15,54 @@ class LoginView extends StatefulWidget {
   State<LoginView> createState() => _LoginViewState();
 }
 
-Future<User?> signInWithGoogle() async {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+_signInWithGoogle() async {
+  GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
-  GoogleSignInAccount? googleSignInAccount;
+  AuthCredential credential = GoogleAuthProvider.credential(
+    accessToken: googleAuth?.accessToken,
+    idToken: googleAuth?.idToken,
+  );
 
-  try {
-    googleSignInAccount =
-        await googleSignIn.signIn().catchError((onError) => null);
-  } catch (e) {
-    print("Không đăng nhập được!!!");
-  }
-
-  if (googleSignInAccount != null) {
-    final GoogleSignInAuthentication googleAuth =
-        await googleSignInAccount!.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+  UserCredential userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Colors.green,
+              ),
+              SizedBox(width: 5),
+              Text(
+                'Đăng nhập thành công',
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Chúc mừng! Bạn đã đăng nhập thành công.',
+            style: TextStyle(fontSize: 20),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const HomeView()));
+              },
+              child: const Text('Đóng'),
+            ),
+          ],
+        );
+      },
     );
-
-    try {
-      final UserCredential authResult =
-          await auth.signInWithCredential(credential);
-      final User? user = authResult.user;
-      String? userName = user!.displayName;
-      print('Tên Gmail của người dùng: $userName');
-      return user;
-    } on FirebaseAuthException catch (e) {
-    } catch (e) {
-      // ...
-    }
   }
-  return null;
+
+  print(userCredential.user?.displayName);
 }
 
 Future<User?> loginUsingEmailPassword(
@@ -309,7 +323,7 @@ class _LoginViewState extends State<LoginView> {
                 padding: EdgeInsets.only(top: size(context, 10)),
                 child: InkWell(
                   onTap: () {
-                    signInWithGoogle().then((userCredential) {
+                    _signInWithGoogle().then((userCredential) {
                       print("đăng nhập thành công");
                       _showSuccessDialog(context);
                     }).catchError((error) {

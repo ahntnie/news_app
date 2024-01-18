@@ -76,8 +76,8 @@ class _BottomNavState extends State<BottomNav> {
           if (widget.idx != 1) {
             print("Thông báo");
             //Trang thông báo
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const NotificationView()));
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => NotificationView()));
           }
         }
         if (indexOfItem == 2) {
