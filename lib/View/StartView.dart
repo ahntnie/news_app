@@ -65,6 +65,7 @@ class _StartViewState extends State<StartView> {
                             borderRadius: BorderRadius.circular(10)),
                         child: TextButton(
                             onPressed: () {
+                              Navigator.pop(context);
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

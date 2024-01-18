@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SignupView.dart';
 
 import 'DrawerView.dart';
@@ -373,27 +374,28 @@ class _LoginViewState extends State<LoginView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.check_circle,
                 color: Colors.green,
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               Text(
                 'Đăng nhập thành công',
+                style: TextStyle(fontSize: size(context, 9)),
               ),
             ],
           ),
           content: const Text(
             'Chúc mừng! Bạn đã đăng nhập thành công.',
-            style: TextStyle(fontSize: 20),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const SignupView()));
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const HomeView()));
               },
               child: const Text('Đóng'),
             ),
@@ -423,7 +425,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               Text(
                 'Đăng nhập thất bại',
-                style: TextStyle(fontSize: size(context, 10)),
+                style: TextStyle(fontSize: size(context, 9)),
               ),
             ],
           ),

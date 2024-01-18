@@ -65,7 +65,6 @@ class NewsRepository {
 
             urlHtml = channel.items[index].link.toString();
 
-            print("tin mới");
             var news = News(
                 title: title,
                 img: img,
@@ -85,7 +84,6 @@ class NewsRepository {
           .then((response) {
         return response.body;
       }).then((bodyString) async {
-        print("lấy thời sự");
         int count = 2;
         if (lstNews_ThoiSu.isEmpty) {
           for (int index = 1; index < count; index++) {
@@ -111,7 +109,6 @@ class NewsRepository {
 
             urlHtml = channel.items[index].link.toString();
 
-            print("Thời sự");
             var news = News(
                 title: title,
                 img: img,
@@ -132,8 +129,6 @@ class NewsRepository {
           .then((response) {
         return response.body;
       }).then((bodyString) async {
-        print("lấy THỂ THAO");
-
         int count = 2;
         if (lstNews_TheThao.isEmpty) {
           for (int index = 1; index < count; index++) {
@@ -159,7 +154,6 @@ class NewsRepository {
             title = channel.items[index].title.toString();
 
             urlHtml = channel.items[index].link.toString();
-            print("Thể thao");
             var news = News(
                 title: title,
                 img: img,
@@ -180,8 +174,6 @@ class NewsRepository {
           .then((response) {
         return response.body;
       }).then((bodyString) async {
-        print("lấy GIÁO DỤC");
-        print("Giáo dục: ${lstNews_GiaoDuc.length}");
         int count = 2;
         if (lstNews_GiaoDuc.isEmpty) {
           for (int index = 1; index < count; index++) {
@@ -207,7 +199,6 @@ class NewsRepository {
             title = channel.items[index].title.toString();
 
             urlHtml = channel.items[index].link.toString();
-            print("Giáo dục");
             var news = News(
                 title: title,
                 img: img,
@@ -228,8 +219,6 @@ class NewsRepository {
           .then((response) {
         return response.body;
       }).then((bodyString) async {
-        print("lấy NGHỆ THUẬT");
-
         int count = 2;
         if (lstNews_NgheThuat.isEmpty) {
           for (int index = 1; index < count; index++) {
@@ -254,7 +243,6 @@ class NewsRepository {
             title = channel.items[index].title.toString();
 
             urlHtml = channel.items[index].link.toString();
-            print("Nghệ thuật");
             var news = News(
                 title: title,
                 img: img,
@@ -311,7 +299,6 @@ class NewsRepository {
           title = channel.items[index].title.toString();
 
           urlHtml = channel.items[index].link.toString();
-          print("Thời sự");
           var news = News(
               title: title,
               img: img,
@@ -626,7 +613,6 @@ class NewsRepository {
               channel.items[index].description.toString().lastIndexOf('>') + 1);
           title = channel.items[index].title.toString();
           urlHtml = channel.items[index].link.toString();
-          print("Thể thao");
           var news = News(
               title: title,
               img: img,
@@ -681,7 +667,6 @@ class NewsRepository {
           title = channel.items[index].title.toString();
 
           urlHtml = channel.items[index].link.toString();
-          print("Giáo dục");
           var news = News(
               title: title,
               img: img,
@@ -734,8 +719,6 @@ class NewsRepository {
           title = channel.items[index].title.toString();
 
           urlHtml = channel.items[index].link.toString();
-          print(urlHtml);
-          print("Nghệ thuật");
           var news = News(
               title: title,
               img: img,

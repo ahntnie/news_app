@@ -347,34 +347,6 @@ class _SignupViewState extends State<SignupView> {
                         _repasswordError.isEmpty &&
                         _emailError.isEmpty) {
                       signup();
-                      _showSuccessDialog(context);
-                    } else {
-                      _showFailedDialog(context);
-                    }
-                  },
-                  child: const Text(
-                    "Đăng ký",
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.blue.shade100)),
-                  onPressed: () async {
-                    validateAccountName();
-                    validatePassword();
-                    validateRepassword();
-                    validateEmail();
-
-                    if (_accountNameError.isEmpty &&
-                        _accountPasswordError.isEmpty &&
-                        _repasswordError.isEmpty &&
-                        _emailError.isEmpty) {
-                      signup();
                       UserRepository.setUser(Users(
                           name: _accountNameController.text,
                           password: _passwordController.text,
@@ -392,31 +364,31 @@ class _SignupViewState extends State<SignupView> {
                     style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Bạn đã có tài khoản? ",
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LoginView()));
-                      },
-                      child: const Text(
-                        "Đăng nhập",
-                        style: TextStyle(
-                            color: Colors.red, fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                ),
               ]),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Text(
+                    "Bạn đã có tài khoản? ",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginView()));
+                    },
+                    child: const Text(
+                      "Đăng nhập",
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
         ),
