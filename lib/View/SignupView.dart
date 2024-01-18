@@ -1,6 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import 'DrawerView.dart';
+import 'HomeView.dart';
+
+import 'package:news_app/Model/User.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
+import 'package:news_app/Repository/UserRepository.dart';
+
 import 'LoginView.dart';
+import 'NavigationBarView.dart';
 
 class SignupView extends StatefulWidget {
   const SignupView({Key? key}) : super(key: key);
@@ -24,12 +34,17 @@ class _SignupViewState extends State<SignupView> {
 
   void signup() async {
     try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      final UserCredential? userCredential = await _auth
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-      );
-      if (userCredential != null) {}
+      )
+          .then((value) {
+        FirebaseAuth.instance.currentUser
+            ?.updateDisplayName(_accountNameController.text);
+      }).onError((error, stackTrace) {
+        print("Error ${error.toString()}");
+      });
     } catch (e) {
       // Xử lý lỗi
       print(e.toString());
@@ -118,8 +133,7 @@ class _SignupViewState extends State<SignupView> {
             color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(20),
           ),
-          width: MediaQuery.of(context).size.width / 1.8,
-          height: 50,
+          width: MediaQuery.of(context).size.width / 2.2,
           child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -129,9 +143,7 @@ class _SignupViewState extends State<SignupView> {
                   Text(
                     "Đăng ký",
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold),
+                        color: Colors.black, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -141,198 +153,192 @@ class _SignupViewState extends State<SignupView> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-            child: Column(
-              children: [
-                Container(
-                  alignment: Alignment.topLeft,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2.0),
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 1.5,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10, top: 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Tài khoản",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: size(context, 10), vertical: size(context, 20)),
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.topLeft,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue, width: 2.0),
+                  color: Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size(context, 7),
+                      vertical: size(context, 10)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Tài khoản",
+                          style: TextStyle(
+                              fontSize: size(context, 7),
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: TextField(
+                          controller: _accountNameController,
+                          onChanged: (_) => validateAccountName(),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: "Nhập tên tài khoản",
+                            labelStyle: TextStyle(
+                              fontSize: size(context, 6),
+                            ),
+                            contentPadding: EdgeInsets.only(
+                                left: size(context, 6), bottom: 10),
+                            errorText: _accountNameError.isNotEmpty
+                                ? _accountNameError
+                                : null,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10, bottom: 15),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                      ),
+                      SizedBox(
+                        height: size(context, 5),
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Mật khẩu",
+                          style: TextStyle(
+                              fontSize: size(context, 7),
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: TextField(
+                          obscureText: _obscureText,
+                          controller: _passwordController,
+                          onChanged: (_) => validatePassword(),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: "Nhập mật khẩu",
+                            labelStyle: TextStyle(
+                              fontSize: size(context, 6),
                             ),
-                            height: 60,
-                            child: TextField(
-                              controller: _accountNameController,
-                              onChanged: (_) => validateAccountName(),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: _accountNameError.isEmpty
-                                    ? 'Nhập tên tài khoản...'
-                                    : " ",
-                                labelStyle: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                errorText: _accountNameError.isNotEmpty
-                                    ? _accountNameError
-                                    : null,
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                              child: Icon(
+                                _obscureText
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.black,
                               ),
                             ),
+                            contentPadding: EdgeInsets.only(
+                                left: size(context, 6), bottom: 10),
+                            errorText: _accountPasswordError.isNotEmpty
+                                ? _accountPasswordError
+                                : null,
                           ),
                         ),
-                        const Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Mật khẩu",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
+                      ),
+                      SizedBox(
+                        height: size(context, 5),
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Nhập lại mật khẩu",
+                          style: TextStyle(
+                              fontSize: size(context, 7),
+                              fontWeight: FontWeight.bold),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10, bottom: 15),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: TextField(
+                          obscureText: _obscureText2,
+                          controller: _repasswordController,
+                          onChanged: (_) => validatePassword(),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: "Nhập lại mật khẩu",
+                            labelStyle: TextStyle(
+                              fontSize: size(context, 6),
                             ),
-                            height: 60,
-                            child: TextField(
-                              controller: _passwordController,
-                              onChanged: (_) => validatePassword(),
-                              obscureText: _obscureText,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: _accountPasswordError.isEmpty
-                                    ? 'Nhập mật khẩu...'
-                                    : " ",
-                                labelStyle: const TextStyle(
-                                  fontSize: 18,
-                                ),
-                                errorText: _accountPasswordError.isNotEmpty
-                                    ? _accountPasswordError
-                                    : null,
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    _obscureText
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                ),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _obscureText2 = !_obscureText2;
+                                });
+                              },
+                              child: Icon(
+                                _obscureText2
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.black,
                               ),
                             ),
+                            contentPadding: EdgeInsets.only(
+                                left: size(context, 6), bottom: 10),
+                            errorText: _repasswordError.isNotEmpty
+                                ? _accountPasswordError
+                                : null,
                           ),
                         ),
-                        const Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Nhập lại mật khẩu",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
+                      ),
+                      SizedBox(
+                        height: size(context, 5),
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Email",
+                          style: TextStyle(
+                              fontSize: size(context, 7),
+                              fontWeight: FontWeight.bold),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10, bottom: 15),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: TextField(
+                          controller: _emailController,
+                          onChanged: (_) => validateEmail(),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: "Nhập email",
+                            labelStyle: TextStyle(
+                              fontSize: size(context, 6),
                             ),
-                            height: 60,
-                            child: TextField(
-                              controller: _repasswordController,
-                              onChanged: (_) => validateRepassword(),
-                              obscureText: _obscureText2,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: _repasswordError.isEmpty
-                                    ? 'Nhập lại mật khẩu...'
-                                    : " ",
-                                labelStyle: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                errorText: _repasswordError.isNotEmpty
-                                    ? _repasswordError
-                                    : null,
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureText2 = !_obscureText2;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    _obscureText2
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            contentPadding: EdgeInsets.only(
+                                left: size(context, 6), bottom: 10),
+                            errorText:
+                                _emailError.isNotEmpty ? _emailError : null,
                           ),
                         ),
-                        const Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Email",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10, bottom: 15),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            height: 60,
-                            child: TextField(
-                              controller: _emailController,
-                              onChanged: (_) => validateEmail(),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: _repasswordError.isEmpty
-                                    ? 'Nhập Email...'
-                                    : " ",
-                                labelStyle: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                errorText:
-                                    _emailError.isNotEmpty ? _emailError : null,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+              ),
+              SizedBox(height: size(context, 5)),
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
@@ -348,6 +354,13 @@ class _SignupViewState extends State<SignupView> {
                         _repasswordError.isEmpty &&
                         _emailError.isEmpty) {
                       signup();
+                      UserRepository.setUser(Users(
+                          name: _accountNameController.text,
+                          password: _passwordController.text,
+                          email: _emailController.text,
+                          birth: DateTime(0),
+                          phone: "",
+                          gender: true));
                       _showSuccessDialog(context);
                     } else {
                       _showFailedDialog(context);
@@ -358,39 +371,37 @@ class _SignupViewState extends State<SignupView> {
                     style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Bạn đã có tài khoản ?",
+              ]),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Text(
+                    "Bạn đã có tài khoản? ",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginView()));
+                    },
+                    child: const Text(
+                      "Đăng nhập",
                       style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
+                          color: Colors.red, fontWeight: FontWeight.bold),
                     ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LoginView()));
-                      },
-                      child: const Text(
-                        "Đăng nhập",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
+                  )
+                ],
+              ),
+            ],
           ),
         ),
       ),
+      bottomNavigationBar: const BottomNav(idx: 2),
+      drawer: const DrawerView(),
     );
   }
 

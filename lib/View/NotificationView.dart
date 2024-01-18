@@ -7,6 +7,8 @@ import 'package:news_app/View/NavigationBarView.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class NotificationView extends StatefulWidget {
   @override
@@ -14,8 +16,36 @@ class NotificationView extends StatefulWidget {
 }
 
 class _NotificationViewState extends State<NotificationView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+  Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
   final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
+
   List<News> viewedNews = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
+  }
+
   Future<RssFeed> _fetchRssFeed() async {
     final response = await http.get(Uri.parse(rssUrl));
     if (response.statusCode == 200) {
@@ -125,6 +155,7 @@ class _NotificationViewState extends State<NotificationView> {
                         urlHtml: umllink,
                         category: "Tin mới nhất",
                       ));
+                      saveViewedNews(viewedNews);
                     });
                     Navigator.push(
                       context,
@@ -199,16 +230,16 @@ class _NotificationViewState extends State<NotificationView> {
   }
 
   Widget _TabStoryAgain() {
+    void desc = "";
     if (viewedNews.isEmpty) {
       return const Center(
         child: Text('Không có tin đã xem'),
       );
     }
-
     return ListView.builder(
       itemCount: viewedNews.length,
       itemBuilder: (context, index) {
-        final news = viewedNews[index];
+        final news = viewedNews[viewedNews.length - index - 1];
         return GestureDetector(
           onTap: () {
             Navigator.push(
@@ -244,7 +275,9 @@ class _NotificationViewState extends State<NotificationView> {
                   const SizedBox(height: 8.0),
                   Image.network("${news.img}"),
                   Text(
-                    news.description,
+                    // ignore: void_checks
+                    desc = news.description.toString().substring(
+                        news.description.toString().lastIndexOf('>') + 1),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
