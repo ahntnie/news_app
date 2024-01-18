@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -7,6 +8,8 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Presenter/CommentPresenter.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
@@ -30,151 +33,145 @@ User? _currentUser = auth.currentUser;
 
 class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
+  List<Comment> lstGetCmt = [];
+  getComment() {
+    //lstComment
+    //print("Vào get nè");
+    setState(() {
+      print(widget.news.title.toString());
+      CommentPresenter.getComment(
+        widget.news.title.toString(),
+      ).then((value) {
+        setState(() {
+          lstGetCmt = CommentRepository.lstComments;
+          lstComment = lstGetCmt.map((e) => BoxComment(e)).toList();
+        });
+      });
+    });
+  }
+
+  bool flag1 = true;
   int count = 0;
-
-  // void removeContainer(int index) {
-  //   setState(() {
-  //     widgetList.removeAt(index);
-  //   });
-  // }
-  // void _incrementCount() {
-  //   setState(() {
-  //     if (count == 0) {
-  //       count = 1;
-  //     } else {
-  //       count = 0;
-  //     }
-  //   });
-  // }
-
-  // void _decrementCount() {
-  //   setState(() {
-  //     if (count == 0) {
-  //       count = 1;
-  //     } else {
-  //       count = 0;
-  //     }
-  //   });
-  // }
-
-  void addComment() {
+  void addComment(Comment comment) {
     setState(() {
       lstComment.add(
-        Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.grey.shade300,
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            width: 350,
-            constraints: const BoxConstraints(
-              minHeight: 100.0,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                      width: MediaQuery.of(context).size.width / 2,
-                      // height: 80,
-                      decoration: const BoxDecoration(),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 40, left: 10),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(50)),
-                                  child: Image.asset(
-                                    "assets/image/vien.jpg",
-                                    fit: BoxFit.cover,
-                                    height: 40,
-                                    width: 40,
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    children: [
-                                      const Text(
-                                        "abc@gmail.com",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(
-                                          "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}  ${DateTime.now().hour}:${DateTime.now().minute}")
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.start,
-                                  children: <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 5),
-                                      child: Text(
-                                        cmt.text,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )),
-                ),
-              ],
-            )),
+        BoxComment(comment),
       );
-
-      lstComment.add(Container(
-        margin: const EdgeInsets.only(left: 30, right: 30),
-        child: Row(
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    // _incrementCount();
-                    // print(count);
-                  },
-                  icon: const Icon(Icons.thumb_up),
-                ),
-                // Text("${count}")
-              ],
-            ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    // _decrementCount();
-                    // print(count);
-                  },
-                  icon: const Icon(Icons.thumb_down),
-                ),
-                // Text("${count}")
-              ],
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            InkWell(
-              onTap: () {},
-              child: Text(
-                "Trả lời",
-                style: TextStyle(color: Colors.blue.shade400),
-              ),
-            ),
-          ],
-        ),
-      ));
+      lstGetCmt.add(comment);
+      CommentRepository.lstComments = lstGetCmt;
     });
+  }
+
+  Container BoxComment(Comment cmt) {
+    return Container(
+      margin: const EdgeInsets.only(top: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey.shade300,
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      width: 350,
+      constraints: const BoxConstraints(
+        minHeight: 100.0,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+                width: MediaQuery.of(context).size.width / 2,
+                // height: 80,
+                decoration: const BoxDecoration(),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 40, left: 10),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(50)),
+                            child: Image.asset(
+                              "assets/image/vien.jpg",
+                              fit: BoxFit.cover,
+                              height: 40,
+                              width: 40,
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(left: 10),
+                            child: Column(
+                              children: [
+                                Text(
+                                  _currentUser!.email.toString(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                Text(cmt.time.toString())
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                margin: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  cmt.content,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  // cmt.like.toString();
+                                },
+                                icon: const Icon(Icons.thumb_up),
+                              ),
+                              // Text("${count}")
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  // _decrementCount();
+                                  // print(count);
+                                },
+                                icon: const Icon(Icons.thumb_down),
+                              ),
+                              // Text("${count}")
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          InkWell(
+                            onTap: () {},
+                            child: Text(
+                              "Trả lời",
+                              style: TextStyle(color: Colors.blue.shade400),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )),
+          ),
+        ],
+      ),
+    );
   }
 
   int minHeightt = 10;
@@ -191,21 +188,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   void initState() {
     super.initState();
     fetchData();
+    getComment();
+    CommentRepository.lstComments = List.filled(
+        0,
+        Comment(
+          title: "",
+          nameUser: "",
+          email: "",
+          content: "",
+          time: "",
+          like: 0,
+        ),
+        growable: true);
   }
-
-  // String url =
-  //     'https://vnexpress.net/chinh-phu-doc-thuc-van-hanh-metro-nhon-ga-ha-noi-va-ben-thanh-suoi-tien-4698264.html';
-
-  // Future<void> fetchHtmlContent() async {
-  //   http.Response response = await http.get(Uri.parse(url));
-
-  //   if (response.statusCode == 200) {
-  //     String htmlContent = response.body;
-  //     print(htmlContent); // In ra đoạn mã HTML
-  //   } else {
-  //     print('Lỗi: ${response.statusCode}');
-  //   }
-  // }
 
   Future<void> fetchData() async {
     try {
@@ -243,7 +238,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           test.forEach((txt) {
             test1 = test1 + txt.split("</picture></div>");
           });
-          print(test1.length);
         });
       }
     } catch (e) {
@@ -367,85 +361,102 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         hintText: 'Bình luận của bạn...',
                         suffixIcon: IconButton(
                             onPressed: () {
-                              if (_currentUser == null) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Thông báo'),
-                                      content: const Text(
-                                          'Vui lòng đăng nhập để bình luận'),
-                                      actions: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                Navigator.of(context).pop();
-                                                cmt.clear();
-                                              },
-                                              child: Text('Đóng'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const LoginView()));
-                                              },
-                                              child: const Text('Đăng nhập'),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              } else {
-                                if (cmt.text.isNotEmpty) {
-                                  CommentRepository.addComment(Comment(
-                                      content: cmt.text,
-                                      email: "12344@gmail.com",
-                                      like: true,
-                                      time: DateTime.now().toString(),
-                                      nameUser: "abc",
-                                      title: widget.news.title,
-                                      delete: true));
-                                  addComment();
-                                } else {
+                              setState(() {
+                                if (_currentUser == null) {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title: const Text('Thông báo'),
                                         content: const Text(
-                                            'Vui lòng nhập bình luận'),
+                                            'Vui lòng đăng nhập để bình luận'),
                                         actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              // Đóng hộp thoại khi người dùng nhấn nút
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Đóng'),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                  Navigator.of(context).pop();
+                                                  cmt.clear();
+                                                },
+                                                child: const Text('Đóng'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const LoginView()));
+                                                },
+                                                child: const Text('Đăng nhập'),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       );
                                     },
                                   );
+                                } else {
+                                  //print(_currentUser!.displayName.toString());
+                                  if (cmt.text.isNotEmpty) {
+                                    CommentRepository.setComment(Comment(
+                                      content: cmt.text,
+                                      email: _currentUser!.email.toString(),
+                                      like: 0,
+                                      time: DateTime.now().toString(),
+                                      nameUser:
+                                          _currentUser!.displayName.toString(),
+                                      title: widget.news.title,
+                                    ));
+                                    addComment(Comment(
+                                      content: cmt.text,
+                                      email: _currentUser!.email.toString(),
+                                      like: 0,
+                                      time: DateTime.now().toString(),
+                                      nameUser:
+                                          _currentUser!.displayName.toString(),
+                                      title: widget.news.title,
+                                    ));
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Thông báo'),
+                                          content: const Text(
+                                              'Vui lòng nhập bình luận'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // Đóng hộp thoại khi người dùng nhấn nút
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text('Đóng'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
                                 }
-                              }
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CategoryDetailView(
+                                                news: widget.news)));
+                              });
                             },
                             icon: const Icon(Icons.send)))),
               ),
               const SizedBox(
                 height: 15,
               ),
-              Column(
-                children: lstComment,
-              ),
+              Column(children: lstGetCmt.map((e) => BoxComment(e)).toList()),
               const SizedBox(
                 height: 10,
               ),

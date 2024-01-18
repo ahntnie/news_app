@@ -18,7 +18,7 @@ class BottomNav extends StatefulWidget {
 final FirebaseAuth auth = FirebaseAuth.instance;
 // String? name = FirebaseAuth.instance.currentUser!.displayName;
 // String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
-User? _currentUser = auth.currentUser;
+var _currentUser = auth.currentUser;
 TextEditingController txt_RoomName = TextEditingController();
 
 class _BottomNavState extends State<BottomNav> {

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/Model/User.dart';
 import 'package:news_app/Presenter/UserPresenter.dart';
@@ -27,11 +28,17 @@ class _SignupViewState extends State<SignupView> {
 
   void signup() async {
     try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      final UserCredential? userCredential = await _auth
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-      );
+      )
+          .then((value) {
+        FirebaseAuth.instance.currentUser
+            ?.updateDisplayName(_accountNameController.text);
+      }).onError((error, stackTrace) {
+        print("Error ${error.toString()}");
+      });
     } catch (e) {
       // Xử lý lỗi
       print(e.toString());

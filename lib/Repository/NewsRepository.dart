@@ -1,4 +1,3 @@
-import 'package:html/parser.dart';
 import 'package:rss_dart/dart_rss.dart';
 import 'package:http/http.dart' as http;
 

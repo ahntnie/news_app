@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:news_app/View/LoginView.dart';
@@ -22,18 +23,25 @@ class _ProfileViewState extends State<ProfileView> {
   bool isShowPhoneNum = false;
   bool isShowGender = false;
   bool isShowBirth = false;
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController gender = TextEditingController();
   TextEditingController birth = TextEditingController();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   String nameError = '';
   String emailError = '';
   String passwordError = '';
   String phoneError = '';
   String birthError = '';
+
+  _signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+    print('Đã đăng xuất');
+  }
 
   bool _isValidEmail(String email) {
     // Biểu thức chính quy để kiểm tra định dạng email
@@ -81,8 +89,13 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const LoginView()));
+                          //
+                          _signOut();
+                          // Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginView()));
                         },
                         child: const Text(
                           "Đăng xuất",

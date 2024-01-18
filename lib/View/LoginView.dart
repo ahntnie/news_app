@@ -181,7 +181,7 @@ class _LoginViewState extends State<LoginView> {
                               onChanged: (_) => validateAccountName(),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                labelText: "Nhập tên tài khoản",
+                                labelText: "Nhập email",
                                 labelStyle: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
