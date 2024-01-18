@@ -34,7 +34,7 @@ User? _currentUser = auth.currentUser;
 class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
   List<Comment> lstGetCmt = [];
-  getComment() {
+  Future<void> getComment() async {
     //lstComment
     //print("Vào get nè");
     setState(() {
@@ -102,7 +102,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             child: Column(
                               children: [
                                 Text(
-                                  _currentUser!.email.toString(),
+                                  cmt.email.toString(),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500),
                                 ),
@@ -249,6 +249,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   Widget build(BuildContext context) {
     int count = 0;
     int count1 = 0;
+    getComment();
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -442,13 +443,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                     );
                                   }
                                 }
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CategoryDetailView(
-                                                news: widget.news)));
                               });
                             },
                             icon: const Icon(Icons.send)))),
