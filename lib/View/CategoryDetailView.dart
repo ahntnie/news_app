@@ -33,7 +33,7 @@ User? _currentUser = auth.currentUser;
 class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
   List<Comment> lstGetCmt = [];
-  getComment() {
+  Future<void> getComment() async {
     //lstComment
     //print("Vào get nè");
     setState(() {
@@ -249,6 +249,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     getComment();
     int count = 0;
     int count1 = 0;
+    getComment();
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -435,7 +436,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                                 // Đóng hộp thoại khi người dùng nhấn nút
                                                 Navigator.of(context).pop();
                                               },
-                                              child: Text('Đóng'),
+                                              child: const Text('Đóng'),
                                             ),
                                           ],
                                         );

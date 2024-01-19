@@ -32,7 +32,19 @@ class CommentRepository {
 
   static Future<void> getComment(String title) async {
     //print("Vào hàm get");
+    lstComments = List.filled(
+        0,
+        Comment(
+          title: "",
+          nameUser: "",
+          email: "",
+          content: "",
+          time: "",
+          like: 0,
+        ),
+        growable: true);
     var response = await FirebaseDatabase.instance.ref().child("comment").get();
+<<<<<<< HEAD
     // print("ê fen ${response.value}");
     //print("abc cc ${response.children.first.value}");
     lstComments = List.filled(
@@ -46,6 +58,8 @@ class CommentRepository {
           like: 0,
         ),
         growable: true);
+=======
+>>>>>>> 3a72adf517f92bac61ffe03c720606122a0f619a
     for (DataSnapshot comment in response.children) {
       if (comment.key.toString() == title) {
         for (DataSnapshot cmt in response.child(title).children) {
@@ -58,10 +72,13 @@ class CommentRepository {
             title: title,
           ));
         }
-        print("Bài viết nè ${comment.key.toString()}");
-
-        //print("Comment nè ${comment.value.toString()}");
+        // print("Bài viết nè ${comment.key.toString()}");
       }
     }
+    lstComments.forEach(
+      (element) {
+        print(element.nameUser);
+      },
+    );
   }
 }
