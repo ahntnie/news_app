@@ -49,7 +49,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   bool flag1 = true;
-  int count = 0;
+  int countt = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -57,6 +57,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       );
       lstGetCmt.add(comment);
       CommentRepository.lstComments = lstGetCmt;
+    });
+  }
+
+  void likeComment(Comment cmt) {
+    setState(() {
+      if (countt == 0) {
+        countt = 1;
+        cmt.like = countt;
+      } else if (countt == 1) {
+        countt = 0;
+        print("đếm $countt");
+        cmt.like = countt;
+      }
     });
   }
 
@@ -108,57 +121,33 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                               ],
                             ),
                           ),
+                          Container(
+                            padding: const EdgeInsets.only(left: 100),
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    likeComment(cmt);
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: cmt.like != 0 ? Colors.red : null,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                child: Text(
-                                  cmt.content,
-                                ),
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                cmt.content,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  // cmt.like.toString();
-                                },
-                                icon: const Icon(Icons.thumb_up),
-                              ),
-                              // Text("${count}")
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  // _decrementCount();
-                                  // print(count);
-                                },
-                                icon: const Icon(Icons.thumb_down),
-                              ),
-                              // Text("${count}")
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: Text(
-                              "Trả lời",
-                              style: TextStyle(color: Colors.blue.shade400),
                             ),
                           ),
                         ],
@@ -405,7 +394,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
+                                      like: countt,
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
@@ -417,7 +406,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
+                                      like: countt,
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
