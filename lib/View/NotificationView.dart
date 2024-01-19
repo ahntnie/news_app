@@ -186,8 +186,12 @@ class _NotificationViewState extends State<NotificationView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Html(
-                            data: rssItem.title ?? '',
+                          Text(
+                            rssItem.title ?? '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0,
+                            ),
                           ),
                           const SizedBox(height: 8.0),
                           Html(
@@ -207,7 +211,7 @@ class _NotificationViewState extends State<NotificationView> {
                   ),
                 );
               } else {
-                return Text("lỗi");
+                return const Text("");
               }
             },
           );
@@ -274,6 +278,9 @@ class _NotificationViewState extends State<NotificationView> {
                   ),
                   const SizedBox(height: 8.0),
                   Image.network("${news.img}"),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Text(
                     // ignore: void_checks
                     desc = news.description.toString().substring(

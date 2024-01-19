@@ -79,6 +79,23 @@ double size(BuildContext context, int baseSize) {
 // }
 
 class _HomeViewState extends State<HomeView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+  Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
+  List<News> viewedNews = [];
   // @override
   // void initState() {
   //   PhatVideo();
@@ -106,6 +123,11 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     Load();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
   }
 
   Load() async {
@@ -194,6 +216,7 @@ class _HomeViewState extends State<HomeView> {
                     itemCount: lstNews.length,
                     itemBuilder: (context, index, realIndex) {
                       final news = lstNews[index].img;
+
                       return buildImage(news, index, lstNews[index], context);
                     },
                     options: CarouselOptions(
@@ -350,6 +373,11 @@ class _HomeViewState extends State<HomeView> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: InkWell(
         onTap: () {
+          setState(() {
+            viewedNews.add(news);
+            saveViewedNews(viewedNews);
+            print("đã lưu");
+          });
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => CategoryDetailView(news: news)));
         },
@@ -457,6 +485,9 @@ Widget buildImage(
         String assetImage, int index, News news, BuildContext context) =>
     InkWell(
       onTap: () {
+        viewedNews.add(news);
+        saveViewedNews(viewedNews);
+        print("đã lưu");
         Navigator.popUntil(context, (route) => route.isFirst);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => CategoryDetailView(
