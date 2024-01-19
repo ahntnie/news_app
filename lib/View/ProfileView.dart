@@ -38,10 +38,11 @@ class _ProfileViewState extends State<ProfileView> {
   String phoneError = '';
   String birthError = '';
 
-  _signOut() async {
+  Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
     UserRepository.user = null;
+    
     print('Đã đăng xuất');
   }
 

@@ -12,6 +12,7 @@ import 'package:news_app/Model/User.dart';
 import 'package:news_app/Presenter/CommentPresenter.dart';
 import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/LoginView.dart';
@@ -363,7 +364,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
-                                if (_currentUser == null) {
+                                if (UserRepository.user == null) {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -405,20 +406,22 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   if (cmt.text.isNotEmpty) {
                                     CommentRepository.setComment(Comment(
                                       content: cmt.text,
-                                      email: _currentUser!.email.toString(),
+                                      email:
+                                          UserRepository.user!.email.toString(),
                                       like: 0,
                                       time: DateTime.now().toString(),
                                       nameUser:
-                                          _currentUser!.displayName.toString(),
+                                         UserRepository.user!.displayName.toString(),
                                       title: widget.news.title,
                                     ));
                                     addComment(Comment(
                                       content: cmt.text,
-                                      email: _currentUser!.email.toString(),
+                                      email:
+                                          UserRepository.user!.email.toString(),
                                       like: 0,
                                       time: DateTime.now().toString(),
                                       nameUser:
-                                          _currentUser!.displayName.toString(),
+                                           UserRepository.user!.displayName.toString(),
                                       title: widget.news.title,
                                     ));
                                     cmt.clear();
