@@ -303,7 +303,8 @@ class _LoginViewState extends State<LoginView> {
                               context: context);
                           print(user);
                           if (user != null) {
-                            UserRepository.user=user;
+                            UserRepository.user = user;
+                            print("Email là : ");
                             // ignore: use_build_context_synchronously
                             _showSuccessDialog(context);
                           } else {

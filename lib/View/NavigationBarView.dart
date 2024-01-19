@@ -83,7 +83,13 @@ class _BottomNavState extends State<BottomNav> {
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
-            //  if(UserRepository.user.)
+            if (UserRepository.user == null) {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const LoginView()));
+            } else {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ProfileView()));
+            }
           }
         }
       },

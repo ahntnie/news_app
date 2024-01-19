@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 
@@ -40,6 +41,7 @@ class _ProfileViewState extends State<ProfileView> {
   _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
+    UserRepository.user = null;
     print('Đã đăng xuất');
   }
 

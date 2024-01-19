@@ -23,7 +23,7 @@ class _NotificationViewState extends State<NotificationView> {
     await prefs.setStringList('viewedNews', viewedNewsJsonList);
   }
 
-  Future<List<News>> loadViewedNews() async {
+   Future<List<News>> loadViewedNews() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
     List<News> viewedNews = viewedNewsJsonList
