@@ -1,4 +1,4 @@
-class User {
+class Users{
   final String name;
   final String email;
   final String phone;
@@ -6,7 +6,7 @@ class User {
   final String password;
   final bool gender;
 
-  User({
+  Users({
     required this.name,
     required this.email,
     required this.password,

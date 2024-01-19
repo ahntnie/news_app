@@ -2,18 +2,16 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:news_app/Model/User.dart';
+import 'package:news_app/Model/Users.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/DrawerView.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/StartView.dart';
-import 'package:news_app/View/UserView.dart';
 import 'package:news_app/forgetpassword.dart';
 import 'package:news_app/loginscreen.dart';
 import 'package:news_app/signupscreen.dart';
 
 import 'View/CategoryView.dart';
-import 'View/test.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

@@ -20,6 +20,8 @@ class _ProfileViewState extends State<ProfileView> {
   bool isShowGender = false;
   bool isShowBirth = false;
 
+  bool? Gender;
+
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
@@ -32,13 +34,6 @@ class _ProfileViewState extends State<ProfileView> {
   String passwordError = '';
   String phoneError = '';
   String birthError = '';
-
-  bool _isValidEmail(String email) {
-    // Biểu thức chính quy để kiểm tra định dạng email
-    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-    final regex = RegExp(pattern);
-    return regex.hasMatch(email);
-  }
 
   bool _isValidPhone(String phone) {
     // Biểu thức chính quy để kiểm tra định dạng số điện thoại
@@ -164,54 +159,15 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 leading: const Text('Email'),
               ),
-              Visibility(
-                visible: isShowEmail,
-                replacement: TextField(
-                    controller: email,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[400],
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(15)))),
-                child: Container(
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.grey[200]),
-                  child: Column(
-                    children: [
-                      const Text("Nhập Email"),
-                      TextField(
-                          controller: email,
-                          decoration: InputDecoration(
-                              errorText:
-                                  emailError.isNotEmpty ? emailError : null,
-                              filled: true,
-                              fillColor: Colors.grey[350],
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(15)))),
-                      ElevatedButton(
-                          onPressed: () async {
-                            setState(() {
-                              final accountEmail = email.text.trim();
-                              if (accountEmail.isEmpty) {
-                                emailError = 'Email không được bỏ trống';
-                              } else if (!_isValidEmail(accountEmail)) {
-                                emailError = 'Email không hợp lệ';
-                              } else {
-                                emailError = '';
-                                isShowEmail = !isShowEmail;
-                              }
-                            });
-                          },
-                          child: const Text("Lưu thay đổi"))
-                    ],
-                  ),
-                ),
-              ),
+              TextField(
+                  controller: email,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[400],
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(15)))),
               const ListTile(
                 leading: Text('Mật khẩu'),
               ),
