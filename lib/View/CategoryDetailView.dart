@@ -8,6 +8,7 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Model/User.dart';
 import 'package:news_app/Presenter/CommentPresenter.dart';
 import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
@@ -102,11 +103,11 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             child: Column(
                               children: [
                                 Text(
-                                  _currentUser!.email.toString(),
+                                  cmt.email.toString(),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500),
                                 ),
-                                Text(cmt.time.toString())
+                                Text(cmt.time.substring(0, 19))
                               ],
                             ),
                           ),
@@ -247,6 +248,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    getComment();
     int count = 0;
     int count1 = 0;
     return Scaffold(
@@ -420,6 +422,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                           _currentUser!.displayName.toString(),
                                       title: widget.news.title,
                                     ));
+                                    cmt.clear();
                                   } else {
                                     showDialog(
                                       context: context,
@@ -442,13 +445,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                     );
                                   }
                                 }
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CategoryDetailView(
-                                                news: widget.news)));
                               });
                             },
                             icon: const Icon(Icons.send)))),
