@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:card_swiper/card_swiper.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,6 +13,7 @@ import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:video_player/video_player.dart';
@@ -76,6 +79,23 @@ double size(BuildContext context, int baseSize) {
 // }
 
 class _HomeViewState extends State<HomeView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+  Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
+  List<News> viewedNews = [];
   // @override
   // void initState() {
   //   PhatVideo();
@@ -100,6 +120,11 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     Load();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
   }
 
   Load() async {
@@ -202,6 +227,7 @@ class _HomeViewState extends State<HomeView> {
                     itemCount: lstNews.length,
                     itemBuilder: (context, index, realIndex) {
                       final news = lstNews[index].img;
+
                       return buildImage(news, index, lstNews[index], context);
                     },
                     options: CarouselOptions(
@@ -311,6 +337,11 @@ class _HomeViewState extends State<HomeView> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: InkWell(
         onTap: () {
+          setState(() {
+            viewedNews.add(news);
+            saveViewedNews(viewedNews);
+            print("đã lưu");
+          });
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => CategoryDetailView(news: news)));
         },
@@ -418,6 +449,9 @@ Widget buildImage(
         String assetImage, int index, News news, BuildContext context) =>
     InkWell(
       onTap: () {
+        viewedNews.add(news);
+        saveViewedNews(viewedNews);
+        print("đã lưu");
         Navigator.popUntil(context, (route) => route.isFirst);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => CategoryDetailView(
