@@ -42,6 +42,7 @@ class _SignupViewState extends State<SignupView> {
           .then((value) {
         FirebaseAuth.instance.currentUser
             ?.updateDisplayName(_accountNameController.text);
+          
       }).onError((error, stackTrace) {
         print("Error ${error.toString()}");
       });

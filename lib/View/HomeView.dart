@@ -109,16 +109,22 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Load() async {
-    NewsPresenter.getNews().then((value) {
-      setState(() {
-        lstNews = NewsRepository.lstNews;
-        lstNews_ThoiSu = NewsRepository.lstNews_ThoiSu;
-        lstNews_TheThao = NewsRepository.lstNews_TheThao;
-        lstNews_GiaoDuc = NewsRepository.lstNews_GiaoDuc;
-        lstNews_NgheThuat = NewsRepository.lstNews_NgheThuat;
-        lstViewedNews = NewsRepository.lstViewedNews;
+    if ((lstNews.isEmpty ||
+        lstNews_GiaoDuc.isEmpty ||
+        lstNews_NgheThuat.isEmpty ||
+        lstNews_TheThao.isEmpty ||
+        lstNews_ThoiSu.isEmpty)) {
+      NewsPresenter.getNews().then((value) {
+        setState(() {
+          lstNews = NewsRepository.lstNews;
+          lstNews_ThoiSu = NewsRepository.lstNews_ThoiSu;
+          lstNews_TheThao = NewsRepository.lstNews_TheThao;
+          lstNews_GiaoDuc = NewsRepository.lstNews_GiaoDuc;
+          lstNews_NgheThuat = NewsRepository.lstNews_NgheThuat;
+          lstViewedNews = NewsRepository.lstViewedNews;
+        });
       });
-    });
+    }
   }
 
   double FontSize(double value, BuildContext context) {
@@ -134,88 +140,12 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    if ((lstNews.isEmpty ||
-            lstNews_GiaoDuc.isEmpty ||
-            lstNews_NgheThuat.isEmpty ||
-            lstNews_TheThao.isEmpty ||
-            lstNews_ThoiSu.isEmpty) &&
-        lstViewedNews.isEmpty) {
-      Load();
-      return Center(
-        child: Stack(
-          children: [
-            SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Image.asset(
-                  "assets/image/iconNews.jpg",
-                  fit: BoxFit.fill,
-                )),
-            Padding(
-              padding: const EdgeInsets.only(top: 400),
-              child: LoadingAnimationWidget.hexagonDots(
-                color: Colors.grey,
-                size: 50,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else if ((lstNews.isEmpty ||
-            lstNews_GiaoDuc.isEmpty ||
-            lstNews_NgheThuat.isEmpty ||
-            lstNews_TheThao.isEmpty ||
-            lstNews_ThoiSu.isEmpty) &&
-        lstViewedNews.isNotEmpty) {
-      Load();
-      return SafeArea(
-          child: Scaffold(
-        appBar: AppBar(
-          title: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            width: MediaQuery.of(context).size.width / 2.2,
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("VLTT "),
-                Text(
-                  "Tin tức",
-                  style: TextStyle(color: Colors.blue),
-                )
-              ],
-            ),
-          ),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Stack(
-            children: [
-              SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: Image.asset(
-                    "assets/image/iconNews.jpg",
-                    fit: BoxFit.fill,
-                  )),
-              Padding(
-                padding: const EdgeInsets.only(top: 400),
-                child: LoadingAnimationWidget.hexagonDots(
-                  color: Colors.grey,
-                  size: 50,
-                ),
-              ),
-            ],
-          ),
-        ),
-        drawer: const DrawerView(),
-        bottomNavigationBar: const BottomNav(idx: 0),
-      ));
-    } else {
-      Load();
+    Load();
+    if (!(lstNews.isEmpty ||
+        lstNews_GiaoDuc.isEmpty ||
+        lstNews_NgheThuat.isEmpty ||
+        lstNews_TheThao.isEmpty ||
+        lstNews_ThoiSu.isEmpty)) {
       return SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -365,6 +295,53 @@ class _HomeViewState extends State<HomeView> {
               idx: 0,
             )),
       );
+    } else {
+      return SafeArea(
+          child: Scaffold(
+        appBar: AppBar(
+          title: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            width: MediaQuery.of(context).size.width / 2.2,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("VLTT "),
+                Text(
+                  "Tin tức",
+                  style: TextStyle(color: Colors.blue),
+                )
+              ],
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Stack(
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Image.asset(
+                    "assets/image/iconNews.jpg",
+                    fit: BoxFit.fill,
+                  )),
+              Padding(
+                padding: const EdgeInsets.only(top: 400),
+                child: LoadingAnimationWidget.hexagonDots(
+                  color: Colors.grey,
+                  size: 50,
+                ),
+              ),
+            ],
+          ),
+        ),
+        drawer: const DrawerView(),
+        bottomNavigationBar: const BottomNav(idx: 0),
+      ));
     }
   }
 
