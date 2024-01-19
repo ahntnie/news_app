@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SignupView.dart';
 
@@ -302,6 +303,8 @@ class _LoginViewState extends State<LoginView> {
                               context: context);
                           print(user);
                           if (user != null) {
+                            UserRepository.user = user;
+                            print("Email là : ");
                             // ignore: use_build_context_synchronously
                             _showSuccessDialog(context);
                           } else {

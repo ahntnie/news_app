@@ -23,7 +23,7 @@ class _NotificationViewState extends State<NotificationView> {
     await prefs.setStringList('viewedNews', viewedNewsJsonList);
   }
 
-  Future<List<News>> loadViewedNews() async {
+   Future<List<News>> loadViewedNews() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
     List<News> viewedNews = viewedNewsJsonList
@@ -142,7 +142,7 @@ class _NotificationViewState extends State<NotificationView> {
                   description: htmlContent.toString(),
                   img: img,
                   urlHtml: umllink,
-                  category: "Tin mới nhất",
+                  category: "Tin mới",
                 );
                 return GestureDetector(
                   onTap: () async {
@@ -153,7 +153,7 @@ class _NotificationViewState extends State<NotificationView> {
                         description: htmlContent.toString(),
                         img: img,
                         urlHtml: umllink,
-                        category: "Tin mới nhất",
+                        category: "Tin mới",
                       ));
                       saveViewedNews(viewedNews);
                     });
@@ -166,7 +166,7 @@ class _NotificationViewState extends State<NotificationView> {
                             description: htmlContent.toString(),
                             img: img,
                             urlHtml: umllink,
-                            category: "Tin mới nhất",
+                            category: "Tin mới",
                           ),
                         ),
                       ),

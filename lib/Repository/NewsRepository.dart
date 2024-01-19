@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:rss_dart/dart_rss.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/News.dart';
 
@@ -22,15 +25,22 @@ class NewsRepository {
   static List<News> lstSearchNews = List.filled(
       0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
       growable: true);
+  static List<News> lstViewedNews = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
   static Future<void> getNews() async {
     try {
       final clientNews = http.Client();
       String img;
       String desc;
       String title;
-
       String urlHtml;
 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+      lstViewedNews = viewedNewsJsonList
+          .map((json) => News.fromJson(jsonDecode(json)))
+          .toList();
       clientNews
           .get(
         Uri.parse(
