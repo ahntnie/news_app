@@ -6,7 +6,7 @@ class UserPresenter {
     return await UserRepository.setUser(user);
   }
 
-  static getUsername(Users name) async {
-    return await UserRepository.getUser(name);
+  static getUsers() async {
+    return await UserRepository.getUsers();
   }
 }
