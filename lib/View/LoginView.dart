@@ -411,8 +411,7 @@ class _LoginViewState extends State<LoginView> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const HomeView()));
+                Navigator.pop(context);
               },
               child: const Text('Đóng'),
             ),
