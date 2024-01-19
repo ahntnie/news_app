@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/News.dart';
 import '../Presenter/NewsPresenter.dart';
@@ -17,6 +20,24 @@ class CategoryNewView extends StatefulWidget {
 }
 
 class _CategoryNewViewState extends State<CategoryNewView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+  Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
+  List<News> viewedNews = [];
+
   List<News> lstNews = List.filled(
       0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
       growable: true);
@@ -28,6 +49,11 @@ class _CategoryNewViewState extends State<CategoryNewView> {
   void initState() {
     super.initState();
     Load();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
   }
 
   String name = "";
@@ -237,6 +263,9 @@ class _CategoryNewViewState extends State<CategoryNewView> {
 ListTile newsCard(BuildContext context, News news) {
   return ListTile(
     onTap: () {
+      viewedNews.add(news);
+      saveViewedNews(viewedNews);
+      print("đã lưu");
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => CategoryDetailView(news: news)));
     },
