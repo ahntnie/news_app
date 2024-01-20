@@ -60,19 +60,81 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
-  void likeComment(Comment cmt) {
-    setState(() {
-      if (countt == 0) {
-        countt = 1;
-        cmt.like = countt;
-      } else if (countt == 1) {
-        countt = 0;
-        print("đếm $countt");
-        cmt.like = countt;
+  Future<void> likeComment(Comment cmt) async {
+    if (!flagg) {
+      var ref = await FirebaseDatabase.instance
+          .ref()
+          .child("comment")
+          .child(cmt.title)
+          .get();
+      for (var _cmt in ref.children) {
+        if (cmt.time == _cmt.child("time").value.toString() &&
+            cmt.nameUser == _cmt.child("nameUser").value.toString()) {
+          var ref1 = await FirebaseDatabase.instance
+              .ref()
+              .child("comment")
+              .child(cmt.title)
+              .child(_cmt.key.toString())
+              .child("like")
+              .set(int.parse(ref
+                      .child(_cmt.key.toString())
+                      .child("like")
+                      .value
+                      .toString()) +
+                  1)
+              .then((value) {
+            print(int.parse(ref
+                    .child(_cmt.key.toString())
+                    .child("like")
+                    .value
+                    .toString()) +
+                1);
+            print("Tăng like thành công");
+          }).catchError((onError) {
+            print('Tăng like không thành công');
+          });
+          break;
+        }
       }
-    });
+    } else {
+      var ref = await FirebaseDatabase.instance
+          .ref()
+          .child("comment")
+          .child(cmt.title)
+          .get();
+      for (var _cmt in ref.children) {
+        if (cmt.time == _cmt.child("time").value.toString() &&
+            cmt.nameUser == _cmt.child("nameUser").value.toString()) {
+          var ref1 = await FirebaseDatabase.instance
+              .ref()
+              .child("comment")
+              .child(cmt.title)
+              .child(_cmt.key.toString())
+              .child("like")
+              .set(int.parse(ref
+                      .child(_cmt.key.toString())
+                      .child("like")
+                      .value
+                      .toString()) -
+                  1)
+              .then((value) {
+            print(int.parse(ref
+                    .child(_cmt.key.toString())
+                    .child("like")
+                    .value
+                    .toString()) -
+                1);
+            print("Giảm like thành công");
+          }).catchError((onError) {
+            print('Giảm like không thành công');
+          });
+          break;
+        }
+      }
+    }
   }
 
+  bool flagg = false;
   Container BoxComment(Comment cmt) {
     return Container(
       margin: const EdgeInsets.only(top: 5),
@@ -122,12 +184,56 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.only(left: 100),
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width / 10),
                             child: Row(
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                    likeComment(cmt);
+                                    if (UserRepository.user == null) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('Thông báo'),
+                                            content: const Text(
+                                                'Vui lòng đăng nhập để bình luận'),
+                                            actions: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: const Text('Đóng'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const LoginView()));
+                                                    },
+                                                    child:
+                                                        const Text('Đăng nhập'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      flagg = !flagg;
+                                      likeComment(cmt);
+                                    }
                                   },
                                   icon: Icon(
                                     Icons.favorite,
@@ -394,10 +500,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: countt,
-                                      time: DateTime.now()
-                                          .toString()
-                                          .substring(0, 19),
+                                      like: 0,
+                                      time: DateTime.now().toString(),
                                       nameUser: UserRepository.user!.displayName
                                           .toString(),
                                       title: widget.news.title,
@@ -406,10 +510,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: countt,
-                                      time: DateTime.now()
-                                          .toString()
-                                          .substring(0, 19),
+                                      like: 0,
+                                      time: DateTime.now().toString(),
                                       nameUser: UserRepository.user!.displayName
                                           .toString(),
                                       title: widget.news.title,

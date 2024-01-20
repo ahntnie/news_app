@@ -20,7 +20,7 @@ class CommentRepository {
       "email": comment.email,
       "content": comment.content,
       "time": comment.time.substring(0, 19),
-      "like": comment.like.toString(),
+      "like": comment.like,
     };
     final ref2 = FirebaseDatabase.instance.ref().child("comment");
     ref2.child(comment.title.toString()).push().set(_comment).then((value) {
