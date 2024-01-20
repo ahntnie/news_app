@@ -11,7 +11,10 @@ import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/LoginView.dart';
+<<<<<<< HEAD
 import 'package:news_app/Model/Users.dart';
+=======
+>>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
 
 class CategoryDetailView extends StatefulWidget {
   const CategoryDetailView({
@@ -24,9 +27,6 @@ class CategoryDetailView extends StatefulWidget {
 }
 
 final FirebaseAuth auth = FirebaseAuth.instance;
-// String? name = FirebaseAuth.instance.currentUser!.displayName;
-// String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
-User? _currentUser = auth.currentUser;
 
 class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
@@ -48,7 +48,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   bool flag1 = true;
-  int count = 0;
+  int countt = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -59,6 +59,38 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
+  Future<void> likeComment(Comment cmt) async {
+    var ref = await FirebaseDatabase.instance
+        .ref()
+        .child("comment")
+        .child(cmt.title)
+        .get();
+    for (var _cmt in ref.children) {
+      List<String> lstLike = [];
+      if (cmt.time == _cmt.child("time").value.toString()) {
+        for (var cm in _cmt.child("lstLike").children) {
+          lstLike.add(cm.value.toString());
+        }
+        lstLike.add(UserRepository.user!.email.toString());
+        var ref1 = await FirebaseDatabase.instance
+            .ref()
+            .child("comment")
+            .child(cmt.title)
+            .child(_cmt.key.toString())
+            .child("lstLike")
+            .set(lstLike)
+            .then((value) {
+          print(lstLike.length);
+          print("Tăng like thành công");
+        }).catchError((onError) {
+          print('Tăng like không thành công');
+        });
+        break;
+      }
+    }
+  }
+
+  bool flagg = false;
   Container BoxComment(Comment cmt) {
     return Container(
       margin: const EdgeInsets.only(top: 5),
@@ -103,7 +135,69 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500),
                                 ),
-                                Text(cmt.time.toString())
+                                Text(cmt.time)
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width / 10),
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    if (UserRepository.user == null) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('Thông báo'),
+                                            content: const Text(
+                                                'Vui lòng đăng nhập để bình luận'),
+                                            actions: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: const Text('Đóng'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const LoginView()));
+                                                    },
+                                                    child:
+                                                        const Text('Đăng nhập'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      flagg = !flagg;
+                                      likeComment(cmt);
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: cmt.lstLike.isNotEmpty
+                                        ? Colors.red
+                                        : null,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -112,52 +206,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                child: Text(
-                                  cmt.content,
-                                ),
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                cmt.content,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  // cmt.like.toString();
-                                },
-                                icon: const Icon(Icons.thumb_up),
-                              ),
-                              // Text("${count}")
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  // _decrementCount();
-                                  // print(count);
-                                },
-                                icon: const Icon(Icons.thumb_down),
-                              ),
-                              // Text("${count}")
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: Text(
-                              "Trả lời",
-                              style: TextStyle(color: Colors.blue.shade400),
                             ),
                           ),
                         ],
@@ -171,8 +225,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     );
   }
 
-  int minHeightt = 10;
-  int minHeight = 100;
   final cmt = TextEditingController();
   String gmtt = "";
   List<String> descriptions = [];
@@ -185,16 +237,16 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   void initState() {
     super.initState();
     fetchData();
-    getComment();
+
     CommentRepository.lstComments = List.filled(
         0,
         Comment(
+          lstLike: [],
           title: "",
           nameUser: "",
           email: "",
           content: "",
           time: "",
-          like: 0,
         ),
         growable: true);
   }
@@ -244,9 +296,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    getComment();
     int count = 0;
     int count1 = 0;
-    getComment();
+
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -383,6 +436,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                               ),
                                               TextButton(
                                                 onPressed: () {
+                                                  Navigator.pop(context);
                                                   // Chuyển sang tap đăng nhập khi chưa đăng nhập
                                                   Navigator.of(context).push(
                                                       MaterialPageRoute(
@@ -401,25 +455,30 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   //print(_currentUser!.displayName.toString());
                                   if (cmt.text.isNotEmpty) {
                                     CommentRepository.setComment(Comment(
+                                      lstLike: [],
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
-                                      time: DateTime.now().toString(),
+                                      time: DateTime.now()
+                                          .toString()
+                                          .substring(0, 19),
                                       nameUser:
-                                         UserRepository.user!.displayName.toString(),
+                                          UserRepository.user!.name.toString(),
                                       title: widget.news.title,
                                     ));
                                     addComment(Comment(
+                                      lstLike: [],
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
-                                      time: DateTime.now().toString(),
+                                      time: DateTime.now()
+                                          .toString()
+                                          .substring(0, 19),
                                       nameUser:
-                                           UserRepository.user!.displayName.toString(),
+                                          UserRepository.user!.name.toString(),
                                       title: widget.news.title,
                                     ));
+                                    cmt.clear();
                                   } else {
                                     showDialog(
                                       context: context,

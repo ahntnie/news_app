@@ -321,6 +321,10 @@ class NewsRepository {
     });
   }
 
+<<<<<<< HEAD
+=======
+  ///Tìm kiếm
+>>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
   static Future<void> searchNews(String stringNews) async {
     final client = http.Client();
     String img;
@@ -346,6 +350,7 @@ class NewsRepository {
             continue;
           }
           if (channel.items[index].title
+<<<<<<< HEAD
                   .toString()
                   .toLowerCase()
                   .contains(stringNews.toString().toLowerCase()) ||
@@ -353,6 +358,11 @@ class NewsRepository {
                   .toString()
                   .toLowerCase()
                   .contains(stringNews.toString().toLowerCase())) {
+=======
+              .toString()
+              .toLowerCase()
+              .contains(stringNews.toString().toLowerCase())) {
+>>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()
@@ -380,206 +390,190 @@ class NewsRepository {
     }).catchError((onError) {
       print("Lỗi lấy mới nhất");
     });
-    // client
-    //     .get(
-    //   Uri.parse(
-    //     'https://vnexpress.net/rss/thoi-su.rss',
-    //   ),
-    // )
-    //     .then((response) {
-    //   return response.body;
-    // }).then((bodyString) async {
-    //   final channel = RssFeed.parse(bodyString);
-    //   if (lstSearchNews.isEmpty) {
-    //     for (int index = 1; index <= channel.items.length; index++) {
-    //       if (!channel.items[index].description
-    //           .toString()
-    //           .contains("img src=")) {
-    //         continue;
-    //       }
-    //       if (channel.items[index].title
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase()) ||
-    //           channel.items[index].description
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase())) {
-    //         img = channel.items[index].description.toString().substring(
-    //             channel.items[index].description
-    //                     .toString()
-    //                     .lastIndexOf('img src=') +
-    //                 9,
-    //             channel.items[index].description.toString().lastIndexOf('>') -
-    //                 11);
-    //         desc = channel.items[index].description.toString().substring(
-    //             channel.items[index].description.toString().lastIndexOf('>') +
-    //                 1);
-    //         title = channel.items[index].title.toString();
+    client
+        .get(
+      Uri.parse(
+        'https://vnexpress.net/rss/thoi-su.rss',
+      ),
+    )
+        .then((response) {
+      return response.body;
+    }).then((bodyString) async {
+      final channel = RssFeed.parse(bodyString);
+      if (lstSearchNews.isEmpty) {
+        for (int index = 1; index <= channel.items.length; index++) {
+          if (!channel.items[index].description
+              .toString()
+              .contains("img src=")) {
+            continue;
+          }
+          if (channel.items[index].title
+              .toString()
+              .toLowerCase()
+              .contains(stringNews.toString().toLowerCase())) {
+            img = channel.items[index].description.toString().substring(
+                channel.items[index].description
+                        .toString()
+                        .lastIndexOf('img src=') +
+                    9,
+                channel.items[index].description.toString().lastIndexOf('>') -
+                    11);
+            desc = channel.items[index].description.toString().substring(
+                channel.items[index].description.toString().lastIndexOf('>') +
+                    1);
+            title = channel.items[index].title.toString();
 
-    //         urlHtml = channel.items[index].link.toString();
-    //         lstSearchNews.add(News(
-    //             title: title,
-    //             description: desc,
-    //             img: img,
-    //             urlHtml: urlHtml,
-    //             category: "Thời sự"));
-    //       }
-    //     }
-    //   }
-    // }).catchError((onError) {
-    //   print("Lỗi lấy thời sự");
-    // });
-    // client
-    //     .get(
-    //   Uri.parse(
-    //     'https://vnexpress.net/rss/the-thao.rss',
-    //   ),
-    // )
-    //     .then((response) {
-    //   return response.body;
-    // }).then((bodyString) async {
-    //   final channel = RssFeed.parse(bodyString);
-    //   if (lstSearchNews.isEmpty) {
-    //     for (int index = 1; index <= channel.items.length; index++) {
-    //       if (!channel.items[index].description
-    //           .toString()
-    //           .contains("img src=")) {
-    //         continue;
-    //       }
-    //       if (channel.items[index].title
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase()) ||
-    //           channel.items[index].description
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase())) {
-    //         img = channel.items[index].description.toString().substring(
-    //             channel.items[index].description
-    //                     .toString()
-    //                     .lastIndexOf('img src=') +
-    //                 9,
-    //             channel.items[index].description.toString().lastIndexOf('>') -
-    //                 11);
-    //         desc = channel.items[index].description.toString().substring(
-    //             channel.items[index].description.toString().lastIndexOf('>') +
-    //                 1);
-    //         title = channel.items[index].title.toString();
+            urlHtml = channel.items[index].link.toString();
+            lstSearchNews.add(News(
+                title: title,
+                description: desc,
+                img: img,
+                urlHtml: urlHtml,
+                category: "Thời sự"));
+          }
+        }
+      }
+    }).catchError((onError) {
+      print("Lỗi lấy thời sự");
+    });
+    client
+        .get(
+      Uri.parse(
+        'https://vnexpress.net/rss/the-thao.rss',
+      ),
+    )
+        .then((response) {
+      return response.body;
+    }).then((bodyString) async {
+      final channel = RssFeed.parse(bodyString);
+      if (lstSearchNews.isEmpty) {
+        for (int index = 1; index <= channel.items.length; index++) {
+          if (!channel.items[index].description
+              .toString()
+              .contains("img src=")) {
+            continue;
+          }
+          if (channel.items[index].title
+              .toString()
+              .toLowerCase()
+              .contains(stringNews.toString().toLowerCase())) {
+            img = channel.items[index].description.toString().substring(
+                channel.items[index].description
+                        .toString()
+                        .lastIndexOf('img src=') +
+                    9,
+                channel.items[index].description.toString().lastIndexOf('>') -
+                    11);
+            desc = channel.items[index].description.toString().substring(
+                channel.items[index].description.toString().lastIndexOf('>') +
+                    1);
+            title = channel.items[index].title.toString();
 
-    //         urlHtml = channel.items[index].link.toString();
-    //         lstSearchNews.add(News(
-    //             title: title,
-    //             description: desc,
-    //             img: img,
-    //             urlHtml: urlHtml,
-    //             category: "Thể thao"));
-    //       }
-    //     }
-    //   }
-    // }).catchError((onError) {
-    //   print("Lỗi lấy thể thao");
-    // });
-    // client
-    //     .get(
-    //   Uri.parse(
-    //     'https://vnexpress.net/rss/giao-duc.rss',
-    //   ),
-    // )
-    //     .then((response) {
-    //   return response.body;
-    // }).then((bodyString) async {
-    //   final channel = RssFeed.parse(bodyString);
-    //   if (lstSearchNews.isEmpty) {
-    //     for (int index = 1; index <= channel.items.length; index++) {
-    //       if (!channel.items[index].description
-    //           .toString()
-    //           .contains("img src=")) {
-    //         continue;
-    //       }
-    //       if (channel.items[index].title
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase()) ||
-    //           channel.items[index].description
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase())) {
-    //         img = channel.items[index].description.toString().substring(
-    //             channel.items[index].description
-    //                     .toString()
-    //                     .lastIndexOf('img src=') +
-    //                 9,
-    //             channel.items[index].description.toString().lastIndexOf('>') -
-    //                 11);
-    //         desc = channel.items[index].description.toString().substring(
-    //             channel.items[index].description.toString().lastIndexOf('>') +
-    //                 1);
-    //         title = channel.items[index].title.toString();
+            urlHtml = channel.items[index].link.toString();
+            lstSearchNews.add(News(
+                title: title,
+                description: desc,
+                img: img,
+                urlHtml: urlHtml,
+                category: "Thể thao"));
+          }
+        }
+      }
+    }).catchError((onError) {
+      print("Lỗi lấy thể thao");
+    });
+    client
+        .get(
+      Uri.parse(
+        'https://vnexpress.net/rss/giao-duc.rss',
+      ),
+    )
+        .then((response) {
+      return response.body;
+    }).then((bodyString) async {
+      final channel = RssFeed.parse(bodyString);
+      if (lstSearchNews.isEmpty) {
+        for (int index = 1; index <= channel.items.length; index++) {
+          if (!channel.items[index].description
+              .toString()
+              .contains("img src=")) {
+            continue;
+          }
+          if (channel.items[index].title
+              .toString()
+              .toLowerCase()
+              .contains(stringNews.toString().toLowerCase())) {
+            img = channel.items[index].description.toString().substring(
+                channel.items[index].description
+                        .toString()
+                        .lastIndexOf('img src=') +
+                    9,
+                channel.items[index].description.toString().lastIndexOf('>') -
+                    11);
+            desc = channel.items[index].description.toString().substring(
+                channel.items[index].description.toString().lastIndexOf('>') +
+                    1);
+            title = channel.items[index].title.toString();
 
-    //         urlHtml = channel.items[index].link.toString();
-    //         lstSearchNews.add(News(
-    //             title: title,
-    //             description: desc,
-    //             img: img,
-    //             urlHtml: urlHtml,
-    //             category: "Giáo dục"));
-    //       }
-    //     }
-    //   }
-    // }).catchError((onError) {
-    //   print("Lỗi lấy giáo dục");
-    // });
-    // client
-    //     .get(
-    //   Uri.parse(
-    //     'https://vnexpress.net/rss/giai-tri.rss',
-    //   ),
-    // )
-    //     .then((response) {
-    //   return response.body;
-    // }).then((bodyString) async {
-    //   final channel = RssFeed.parse(bodyString);
-    //   if (lstSearchNews.isEmpty) {
-    //     for (int index = 1; index <= channel.items.length; index++) {
-    //       if (!channel.items[index].description
-    //           .toString()
-    //           .contains("img src=")) {
-    //         continue;
-    //       }
-    //       if (channel.items[index].title
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase()) ||
-    //           channel.items[index].description
-    //               .toString()
-    //               .toLowerCase()
-    //               .contains(string_news.toString().toLowerCase())) {
-    //         img = channel.items[index].description.toString().substring(
-    //             channel.items[index].description
-    //                     .toString()
-    //                     .lastIndexOf('img src=') +
-    //                 9,
-    //             channel.items[index].description.toString().lastIndexOf('>') -
-    //                 11);
-    //         desc = channel.items[index].description.toString().substring(
-    //             channel.items[index].description.toString().lastIndexOf('>') +
-    //                 1);
-    //         title = channel.items[index].title.toString();
+            urlHtml = channel.items[index].link.toString();
+            lstSearchNews.add(News(
+                title: title,
+                description: desc,
+                img: img,
+                urlHtml: urlHtml,
+                category: "Giáo dục"));
+          }
+        }
+      }
+    }).catchError((onError) {
+      print("Lỗi lấy giáo dục");
+    });
+    client
+        .get(
+      Uri.parse(
+        'https://vnexpress.net/rss/giai-tri.rss',
+      ),
+    )
+        .then((response) {
+      return response.body;
+    }).then((bodyString) async {
+      final channel = RssFeed.parse(bodyString);
+      if (lstSearchNews.isEmpty) {
+        for (int index = 1; index <= channel.items.length; index++) {
+          if (!channel.items[index].description
+              .toString()
+              .contains("img src=")) {
+            continue;
+          }
+          if (channel.items[index].title
+              .toString()
+              .toLowerCase()
+              .contains(stringNews.toString().toLowerCase())) {
+            img = channel.items[index].description.toString().substring(
+                channel.items[index].description
+                        .toString()
+                        .lastIndexOf('img src=') +
+                    9,
+                channel.items[index].description.toString().lastIndexOf('>') -
+                    11);
+            desc = channel.items[index].description.toString().substring(
+                channel.items[index].description.toString().lastIndexOf('>') +
+                    1);
+            title = channel.items[index].title.toString();
 
-    //         urlHtml = channel.items[index].link.toString();
-    //         lstSearchNews.add(News(
-    //             title: title,
-    //             description: desc,
-    //             img: img,
-    //             urlHtml: urlHtml,
-    //             category: "Nghệ thuật"));
-    //       }
-    //     }
-    //   }
-    // }).catchError((onError) {
-    //   print("Lỗi lấy nghệ thuật");
-    // });
+            urlHtml = channel.items[index].link.toString();
+            lstSearchNews.add(News(
+                title: title,
+                description: desc,
+                img: img,
+                urlHtml: urlHtml,
+                category: "Nghệ thuật"));
+          }
+        }
+      }
+    }).catchError((onError) {
+      print("Lỗi lấy nghệ thuật");
+    });
   }
 
   static Future<void> getNews_TheThao() async {

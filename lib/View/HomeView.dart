@@ -141,6 +141,7 @@ class _HomeViewState extends State<HomeView> {
           lstViewedNews = NewsRepository.lstViewedNews;
         });
       });
+
     }
   }
 

@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   shared_preferences: ^2.2.2
   firebase_core: ^2.24.2
-
+  firebase_messaging: ^14.7.10
   cloud_firestore: ^4.13.6
   carousel_slider: ^4.2.1
   flutter_image_slideshow: ^0.1.6
@@ -61,7 +61,7 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icon/icon.png"
-  
+  firebase_analytics: ^10.8.0
 
 
 dev_dependencies:

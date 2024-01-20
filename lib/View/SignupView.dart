@@ -2,7 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'DrawerView.dart';
 import 'HomeView.dart';
+<<<<<<< HEAD
 import 'package:news_app/Model/Users.dart';
+=======
+
+import 'package:news_app/Model/User.dart';
+>>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
 import 'package:news_app/Repository/UserRepository.dart';
 import 'LoginView.dart';
 import 'NavigationBarView.dart';
@@ -37,7 +42,6 @@ class _SignupViewState extends State<SignupView> {
           .then((value) {
         FirebaseAuth.instance.currentUser
             ?.updateDisplayName(_accountNameController.text);
-          
       }).onError((error, stackTrace) {
         print("Error ${error.toString()}");
       });

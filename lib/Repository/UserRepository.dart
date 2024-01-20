@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:news_app/Model/Users.dart';
 
 import 'package:firebase_database/firebase_database.dart';
 
 class UserRepository {
-  static Null user = null;
-  static Users? users;
+  static User? user = null;
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
     var user0 = {
@@ -24,8 +22,29 @@ class UserRepository {
     });
   }
 
-  static Future<void> getUserNameandEmail(Users user) async {
-    var user0 = {
+  static Future<void> getUsers() async {
+    var response = await FirebaseDatabase.instance.ref().child("user").get();
+
+    for (DataSnapshot users in response.children) {
+      if (users.key.toString() == "name") {
+        for (DataSnapshot user in response.child("name").children) {
+          if (response.children.length > lstUsers.length) {
+            lstUsers.add(Users(
+                name: user.child("name").value.toString(),
+                email: user.child("email").value.toString(),
+                password: user.child("password").value.toString(),
+                phone: user.child("phone").value.toString(),
+                birth: user.child("birth").value as DateTime,
+                gender: bool.parse(user.child("gender").value.toString())));
+          }
+        }
+        //print("Comment nè ${comment.value.toString()}");
+      }
+    }
+  }
+
+  static Future<void> getUser(Users user) async {
+    var _user = {
       "name": user.name,
       "email": user.email,
     };
