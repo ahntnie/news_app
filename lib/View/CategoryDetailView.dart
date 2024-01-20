@@ -501,8 +501,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       email:
                                           UserRepository.user!.email.toString(),
                                       like: 0,
-                                      time: DateTime.now().toString(),
-                                      nameUser: UserRepository.user!.displayName
+                                      time: DateTime.now()
+                                          .toString()
+                                          .substring(0, 19),
+                                      nameUser: UserRepository.user!.name
                                           .toString(),
                                       title: widget.news.title,
                                     ));
@@ -511,8 +513,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       email:
                                           UserRepository.user!.email.toString(),
                                       like: 0,
-                                      time: DateTime.now().toString(),
-                                      nameUser: UserRepository.user!.displayName
+                                      time: DateTime.now()
+                                          .toString()
+                                          .substring(0, 19),
+                                      nameUser: UserRepository.user!.name
                                           .toString(),
                                       title: widget.news.title,
                                     ));

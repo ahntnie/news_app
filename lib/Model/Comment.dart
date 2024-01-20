@@ -5,7 +5,6 @@ class Comment {
   String time;
   int like;
   String title;
-
   Comment({
     required this.content,
     required this.email,
