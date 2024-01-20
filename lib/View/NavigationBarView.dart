@@ -58,7 +58,7 @@ class _BottomNavState extends State<BottomNav> {
             ),
             label: "Thông báo"),
         BottomNavigationBarItem(
-            icon: UserRepository.user != null
+            icon: UserRepository.user!.email.isNotEmpty
                 ? ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(50)),
                     child: Image.asset(
@@ -91,7 +91,7 @@ class _BottomNavState extends State<BottomNav> {
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
-            if (UserRepository.user == null) {
+            if (UserRepository.user!.email.toString().isEmpty) {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const LoginView()));
             } else {

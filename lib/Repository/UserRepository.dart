@@ -18,9 +18,9 @@ class UserRepository {
           gender: true),
       growable: true);
   static Users? user = null;
-  static Future<void> saveUser(Users _user) async {
+  static Future<void> saveUser(Users? _user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String string_user = jsonEncode(_user.toJson());
+    String string_user = jsonEncode(_user!.toJson());
     await prefs.setString('User', string_user);
   }
 
