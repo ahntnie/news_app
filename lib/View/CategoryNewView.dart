@@ -41,7 +41,7 @@ class _CategoryNewViewState extends State<CategoryNewView> {
   List<News> lstNews = List.filled(
       0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
       growable: true);
-  List<News> _lstNews = List.filled(
+  final List<News> _lstNews = List.filled(
       0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
       growable: true);
 

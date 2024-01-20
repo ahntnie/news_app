@@ -1,12 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'DrawerView.dart';
 import 'HomeView.dart';
 
 import 'package:news_app/Model/User.dart';
-import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 
 import 'LoginView.dart';

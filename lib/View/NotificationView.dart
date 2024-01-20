@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/DrawerView.dart';
@@ -11,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class NotificationView extends StatefulWidget {
+  const NotificationView({super.key});
+
   @override
   State<NotificationView> createState() => _NotificationViewState();
 }
@@ -23,7 +26,7 @@ class _NotificationViewState extends State<NotificationView> {
     await prefs.setStringList('viewedNews', viewedNewsJsonList);
   }
 
-   Future<List<News>> loadViewedNews() async {
+  Future<List<News>> loadViewedNews() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
     List<News> viewedNews = viewedNewsJsonList
@@ -96,7 +99,7 @@ class _NotificationViewState extends State<NotificationView> {
             const TabBar(
               tabs: [
                 Tab(text: 'Tin mới nhất'),
-                Tab(text: 'Phản hồi bình luận'),
+                Tab(text: 'Bình luận'),
                 Tab(text: 'Tin đã xem'),
               ],
             ),
@@ -229,9 +232,12 @@ class _NotificationViewState extends State<NotificationView> {
 
   Widget _TabComment() {
     return const Center(
-      child: Text('Phản hồi bình luận'),
+      child: Text('Không có bình luận'),
     );
   }
+
+  List<Widget> lstComment = [];
+  List<Comment> lstGetCmt = [];
 
   Widget _TabStoryAgain() {
     void desc = "";
@@ -277,7 +283,7 @@ class _NotificationViewState extends State<NotificationView> {
                     ),
                   ),
                   const SizedBox(height: 8.0),
-                  Image.network("${news.img}"),
+                  Image.network(news.img),
                   const SizedBox(
                     height: 10,
                   ),

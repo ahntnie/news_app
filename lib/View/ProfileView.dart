@@ -1,14 +1,12 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/widgets.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
+
+import '../Model/User.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -41,8 +39,14 @@ class _ProfileViewState extends State<ProfileView> {
   Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
-    UserRepository.user = null;
-    
+    UserRepository.user = Users(
+        name: "",
+        email: "",
+        password: "",
+        birth: DateTime.now(),
+        phone: "",
+        gender: true);
+    UserRepository.saveUser(UserRepository.user);
     print('Đã đăng xuất');
   }
 
@@ -88,7 +92,7 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       const Text(
                         "userName",
-                        style: const TextStyle(color: Colors.black),
+                        style: TextStyle(color: Colors.black),
                       ),
                       ElevatedButton(
                         onPressed: () {

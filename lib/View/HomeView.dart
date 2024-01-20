@@ -1,11 +1,7 @@
 import 'dart:convert';
 
-import 'package:card_swiper/card_swiper.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Model/News.dart';
 import 'package:news_app/Presenter/NewsPresenter.dart';
@@ -16,7 +12,6 @@ import 'package:news_app/View/DrawerView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:video_player/video_player.dart';
 
 import '../Model/Category.dart';
 import 'NavigationBarView.dart';
@@ -146,6 +141,7 @@ class _HomeViewState extends State<HomeView> {
           lstViewedNews = NewsRepository.lstViewedNews;
         });
       });
+
     }
   }
 

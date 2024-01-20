@@ -1,6 +1,8 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/Model/User.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SignupView.dart';
@@ -27,7 +29,7 @@ _signInWithGoogle() async {
 
   UserCredential userCredential =
       await FirebaseAuth.instance.signInWithCredential(credential);
-  void _showSuccessDialog(BuildContext context) {
+  void showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -76,6 +78,13 @@ Future<User?> loginUsingEmailPassword(
     UserCredential userCredential =
         await auth.signInWithEmailAndPassword(email: email, password: password);
     user = userCredential.user;
+    UserRepository.saveUser(Users(
+        name: user!.displayName.toString(),
+        email: email,
+        password: password,
+        birth: DateTime(2024),
+        phone: "",
+        gender: true));
   } on FirebaseAuthException catch (e) {
     if (e.code == "user-not-found") {
       print("No user found that email");
@@ -323,7 +332,6 @@ class _LoginViewState extends State<LoginView> {
                               context: context);
                           print(user);
                           if (user != null) {
-                            UserRepository.user = user;
                             print("Email là : ");
                             // ignore: use_build_context_synchronously
                             _showSuccessDialog(context);
@@ -332,7 +340,6 @@ class _LoginViewState extends State<LoginView> {
                             // ignore: use_build_context_synchronously
                             _showFailedDialog(context);
                           }
-                          ;
                         },
                         child: Text(
                           "Đăng nhập",

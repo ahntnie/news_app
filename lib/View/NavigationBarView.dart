@@ -1,11 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NotificationView.dart';
 
+import '../Model/User.dart';
 import 'ProfileView.dart';
 
 class BottomNav extends StatefulWidget {
@@ -16,28 +15,30 @@ class BottomNav extends StatefulWidget {
   State<BottomNav> createState() => _BottomNavState();
 }
 
-final FirebaseAuth auth = FirebaseAuth.instance;
-// String? name = FirebaseAuth.instance.currentUser!.displayName;
-// String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
-var _currentUser = auth.currentUser;
+Users _user = Users(
+    name: "",
+    email: "",
+    password: "",
+    birth: DateTime(2024),
+    phone: "",
+    gender: true);
 TextEditingController txt_RoomName = TextEditingController();
-Future<bool> checkLoginStatus(String email) async {
-  try {
-    UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password:
-          'password', // Đổi 'password' thành mật khẩu tương ứng với tài khoản
-    );
-    return true; // Tài khoản đã đăng nhập
-  } catch (e) {
-    return false; // Tài khoản chưa đăng nhập hoặc xảy ra lỗi
-  }
-}
 
 class _BottomNavState extends State<BottomNav> {
+  Future<void> getUser() async {
+    UserRepository.loadUser().then((value) {
+      setState(() {
+        _user = UserRepository.user!;
+        print("Lấy thành công user: ${UserRepository.user!.name}");
+      });
+    }).catchError((onError) {
+      print("Lấy user không thành công");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    getUser();
     //print(name);
     return BottomNavigationBar(
       items: [
@@ -55,14 +56,19 @@ class _BottomNavState extends State<BottomNav> {
             ),
             label: "Thông báo"),
         BottomNavigationBarItem(
-            icon: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(50)),
-                child: Image.asset(
-                  "assets/image/vien.jpg",
-                  fit: BoxFit.cover,
-                  height: 30,
-                  width: 30,
-                )),
+            icon: UserRepository.user!.email.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                    child: Image.asset(
+                      "assets/image/vien.jpg",
+                      fit: BoxFit.cover,
+                      height: 30,
+                      width: 30,
+                    ))
+                : const Icon(
+                    Icons.account_circle_rounded,
+                    size: 30,
+                  ),
             label: "Tài khoản"),
       ],
       currentIndex: widget.idx,
@@ -78,12 +84,12 @@ class _BottomNavState extends State<BottomNav> {
             print("Thông báo");
             //Trang thông báo
             Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => NotificationView()));
+                MaterialPageRoute(builder: (context) => const NotificationView()));
           }
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
-            if (UserRepository.user == null) {
+            if (UserRepository.user!.email.toString().isEmpty) {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const LoginView()));
             } else {

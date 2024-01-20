@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
@@ -8,8 +9,6 @@ import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SearchView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../Model/News.dart';
 
 class DrawerView extends StatefulWidget {
   const DrawerView({super.key});
