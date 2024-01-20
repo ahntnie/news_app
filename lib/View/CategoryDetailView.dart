@@ -409,7 +409,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
-                                      nameUser: UserRepository.user!.displayName
+                                      nameUser: UserRepository.user!.name
                                           .toString(),
                                       title: widget.news.title,
                                     ));
@@ -421,7 +421,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
-                                      nameUser: UserRepository.user!.displayName
+                                      nameUser: UserRepository.user!.name
                                           .toString(),
                                       title: widget.news.title,
                                     ));

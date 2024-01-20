@@ -42,7 +42,6 @@ class _ProfileViewState extends State<ProfileView> {
     await _googleSignIn.signOut();
     await _auth.signOut();
     UserRepository.user = null;
-    
     print('Đã đăng xuất');
   }
 
@@ -88,7 +87,7 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       const Text(
                         "userName",
-                        style: const TextStyle(color: Colors.black),
+                        style: TextStyle(color: Colors.black),
                       ),
                       ElevatedButton(
                         onPressed: () {

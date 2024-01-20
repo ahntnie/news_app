@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/User.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -14,7 +17,20 @@ class UserRepository {
           phone: "",
           gender: true),
       growable: true);
-  static User? user = null;
+  static Users? user = null;
+  static Future<void> saveUser(Users _user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String string_user = jsonEncode(_user.toJson());
+    await prefs.setString('User', string_user);
+  }
+
+  static Future<Users?> loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String string_user = prefs.getString('User') ?? "";
+    user = Users.fromJson(jsonDecode(string_user));
+    return user;
+  }
+
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
     var _user = {
