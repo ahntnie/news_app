@@ -1,8 +1,15 @@
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
+import 'package:news_app/Model/Users.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 
 class ProfileView extends StatefulWidget {
@@ -20,8 +27,6 @@ class _ProfileViewState extends State<ProfileView> {
   bool isShowGender = false;
   bool isShowBirth = false;
 
-  bool? Gender;
-
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
@@ -32,8 +37,27 @@ class _ProfileViewState extends State<ProfileView> {
   String nameError = '';
   String emailError = '';
   String passwordError = '';
+  String genderError = '';
   String phoneError = '';
   String birthError = '';
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> _signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+    UserRepository.user = null;
+    print('Đã đăng xuất');
+  }
+
+  
+
+  void updateUser() {
+    
+  }
+
+  // Bỏ kiểm tra Email
 
   bool _isValidPhone(String phone) {
     // Biểu thức chính quy để kiểm tra định dạng số điện thoại
@@ -157,7 +181,8 @@ class _ProfileViewState extends State<ProfileView> {
                       ? const Icon(Icons.close)
                       : const Icon(Icons.edit),
                 ),
-                leading: const Text('Email'),
+                leading: const Text(
+                    'Email'), // Email sửa lại chỉ cho xem không cho sửa nè
               ),
               TextField(
                   controller: email,
@@ -167,7 +192,8 @@ class _ProfileViewState extends State<ProfileView> {
                       fillColor: Colors.grey[400],
                       border: OutlineInputBorder(
                           borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(15)))),
+                          borderRadius: BorderRadius.circular(
+                              15)))), // BỎ HẾT ĐỂ LẠI CÁI TEXTFIELD NÀY THÔI
               const ListTile(
                 leading: Text('Mật khẩu'),
               ),
@@ -228,6 +254,9 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                           controller: phone,
                           decoration: InputDecoration(
+                              errorText: phoneError.isNotEmpty
+                                  ? phoneError
+                                  : null, // bổ sung cái này bữa thiếu từ đây nè
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
@@ -286,8 +315,54 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       const Text("Nhập giới tính"),
                       TextField(
+                          // Sửa chỗ giới tính này thành Dialog nè
+                          onTap: () async {
+                            await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 150,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Column(
+                                          children: [
+                                            RadioListTile(
+                                              title: Text("Nam"),
+                                              value: false,
+                                              groupValue: gender,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  gender.text = "Nam";
+
+                                                  Navigator.pop(context);
+                                                });
+                                              },
+                                            ),
+                                            RadioListTile(
+                                              title: Text("Nữ"),
+                                              value: true,
+                                              groupValue: gender,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  gender.text = "Nữ";
+                                                  Navigator.pop(context);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
                           controller: gender,
+                          readOnly: true,
                           decoration: InputDecoration(
+                              errorText:
+                                  genderError.isNotEmpty ? genderError : null,
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
@@ -295,7 +370,15 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
                           onPressed: () {
-                            setState(() {});
+                            setState(() {
+                              final accountGender = gender.text.trim();
+                              if (accountGender.isEmpty) {
+                                genderError = 'Vui lòng chọn giới tính';
+                              } else {
+                                genderError = '';
+                                isShowGender = !isShowGender;
+                              }
+                            }); // Tới đây nhaaaaaaaaaaaaaaaaaaa
                           },
                           child: const Text("Lưu thay đổi"))
                     ],

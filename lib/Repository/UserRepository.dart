@@ -2,6 +2,7 @@ import '../Model/Users.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class UserRepository {
+  static Users? user = null;
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
     var _user = {
@@ -25,6 +26,7 @@ class UserRepository {
   }
 
   static List<Users> lstUsers = List.filled(
+      // Tiến Bịp
       0,
       Users(
           name: "",
@@ -34,7 +36,9 @@ class UserRepository {
           phone: "",
           gender: true),
       growable: true);
-  static Future<void> getUsers() async {
+
+  static Future<void> getUsertoList() async {
+    // Của Tiến Bịp
     var response = await FirebaseDatabase.instance.ref().child("user").get();
 
     for (DataSnapshot users in response.children) {
@@ -53,5 +57,24 @@ class UserRepository {
         //print("Comment nè ${comment.value.toString()}");
       }
     }
+  }
+
+  static Future<void> getUser(Users user) async {
+    // Của Liêm
+    var _user = {
+      "name": user.name,
+      "email": user.email,
+      "password": user.password,
+      "birth": user.birth.toString(),
+      "phone": user.phone,
+      "gender": user.gender
+    };
+    final ref1 = FirebaseDatabase.instance.ref().child(user.name);
+    ref1.child(user.name.toString()).get();
+    ref1.child(user.email.toString()).get();
+    ref1.child(user.phone.toString()).get();
+    ref1.child(user.password.toString()).get();
+    ref1.child(user.birth.toString()).get();
+    ref1.child(user.gender.toString()).get();
   }
 }

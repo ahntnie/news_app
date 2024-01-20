@@ -71,7 +71,7 @@ class _BottomNavState extends State<BottomNav> {
           if (widget.idx != 2) {
             _currentUser == null
                 ? Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const LoginView()))
+                    MaterialPageRoute(builder: (context) => ProfileView()))
                 :
 
                 // Trang profile
