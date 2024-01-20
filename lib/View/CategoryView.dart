@@ -345,7 +345,7 @@ Widget buildImage(
 
 class CategoryTile extends StatelessWidget {
   final image, categoryName;
-  CategoryTile({this.categoryName, this.image});
+  const CategoryTile({super.key, this.categoryName, this.image});
 
   @override
   Widget build(BuildContext context) {

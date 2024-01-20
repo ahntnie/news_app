@@ -1,16 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
-import 'package:news_app/Model/User.dart';
 import 'package:news_app/Presenter/CommentPresenter.dart';
-import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
@@ -61,75 +57,32 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   Future<void> likeComment(Comment cmt) async {
-    if (!flagg) {
-      var ref = await FirebaseDatabase.instance
-          .ref()
-          .child("comment")
-          .child(cmt.title)
-          .get();
-      for (var _cmt in ref.children) {
-        if (cmt.time == _cmt.child("time").value.toString() &&
-            cmt.nameUser == _cmt.child("nameUser").value.toString()) {
-          var ref1 = await FirebaseDatabase.instance
-              .ref()
-              .child("comment")
-              .child(cmt.title)
-              .child(_cmt.key.toString())
-              .child("like")
-              .set(int.parse(ref
-                      .child(_cmt.key.toString())
-                      .child("like")
-                      .value
-                      .toString()) +
-                  1)
-              .then((value) {
-            print(int.parse(ref
-                    .child(_cmt.key.toString())
-                    .child("like")
-                    .value
-                    .toString()) +
-                1);
-            print("Tăng like thành công");
-          }).catchError((onError) {
-            print('Tăng like không thành công');
-          });
-          break;
+    var ref = await FirebaseDatabase.instance
+        .ref()
+        .child("comment")
+        .child(cmt.title)
+        .get();
+    for (var _cmt in ref.children) {
+      List<String> lstLike = [];
+      if (cmt.time == _cmt.child("time").value.toString()) {
+        for (var cm in _cmt.child("lstLike").children) {
+          lstLike.add(cm.value.toString());
         }
-      }
-    } else {
-      var ref = await FirebaseDatabase.instance
-          .ref()
-          .child("comment")
-          .child(cmt.title)
-          .get();
-      for (var _cmt in ref.children) {
-        if (cmt.time == _cmt.child("time").value.toString() &&
-            cmt.nameUser == _cmt.child("nameUser").value.toString()) {
-          var ref1 = await FirebaseDatabase.instance
-              .ref()
-              .child("comment")
-              .child(cmt.title)
-              .child(_cmt.key.toString())
-              .child("like")
-              .set(int.parse(ref
-                      .child(_cmt.key.toString())
-                      .child("like")
-                      .value
-                      .toString()) -
-                  1)
-              .then((value) {
-            print(int.parse(ref
-                    .child(_cmt.key.toString())
-                    .child("like")
-                    .value
-                    .toString()) -
-                1);
-            print("Giảm like thành công");
-          }).catchError((onError) {
-            print('Giảm like không thành công');
-          });
-          break;
-        }
+        lstLike.add(UserRepository.user!.email.toString());
+        var ref1 = await FirebaseDatabase.instance
+            .ref()
+            .child("comment")
+            .child(cmt.title)
+            .child(_cmt.key.toString())
+            .child("lstLike")
+            .set(lstLike)
+            .then((value) {
+          print(lstLike.length);
+          print("Tăng like thành công");
+        }).catchError((onError) {
+          print('Tăng like không thành công');
+        });
+        break;
       }
     }
   }
@@ -237,7 +190,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   },
                                   icon: Icon(
                                     Icons.favorite,
-                                    color: cmt.like != 0 ? Colors.red : null,
+                                    color: cmt.lstLike.isNotEmpty
+                                        ? Colors.red
+                                        : null,
                                   ),
                                 ),
                               ],
@@ -283,12 +238,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     CommentRepository.lstComments = List.filled(
         0,
         Comment(
+          lstLike: [],
           title: "",
           nameUser: "",
           email: "",
           content: "",
           time: "",
-          like: 0,
         ),
         growable: true);
   }
@@ -303,9 +258,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         gmtt = response.headers['date'].toString();
         final fullClass = document.querySelectorAll('.fck_detail');
         // print(fullClass.length);
-        fullClass.forEach((element) {
+        for (var element in fullClass) {
           final imageElement = document.querySelectorAll('.fig-picture');
-          imageElement.forEach((e) {
+          for (var e in imageElement) {
             final img = e.outerHtml
                 .toString()
                 .substring(
@@ -315,8 +270,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 .replaceAll("amp;", '');
 
             imageUrls.add(img.trim());
-          });
-        });
+          }
+        }
 
         //print(fullClass[0].toString().split('div class="fig-picture"'));
 
@@ -326,9 +281,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
           test = contents[0].split('<figure data-size="true"');
 
-          test.forEach((txt) {
+          for (var txt in test) {
             test1 = test1 + txt.split("</picture></div>");
-          });
+          }
         });
       }
     } catch (e) {
@@ -497,27 +452,27 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   //print(_currentUser!.displayName.toString());
                                   if (cmt.text.isNotEmpty) {
                                     CommentRepository.setComment(Comment(
+                                      lstLike: [],
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
-                                      nameUser: UserRepository.user!.name
-                                          .toString(),
+                                      nameUser:
+                                          UserRepository.user!.name.toString(),
                                       title: widget.news.title,
                                     ));
                                     addComment(Comment(
+                                      lstLike: [],
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
-                                      nameUser: UserRepository.user!.name
-                                          .toString(),
+                                      nameUser:
+                                          UserRepository.user!.name.toString(),
                                       title: widget.news.title,
                                     ));
                                     cmt.clear();

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/User.dart';
@@ -17,23 +16,23 @@ class UserRepository {
           phone: "",
           gender: true),
       growable: true);
-  static Users? user = null;
-  static Future<void> saveUser(Users? _user) async {
+  static Users? user;
+  static Future<void> saveUser(Users? user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String string_user = jsonEncode(_user!.toJson());
-    await prefs.setString('User', string_user);
+    String stringUser = jsonEncode(user!.toJson());
+    await prefs.setString('User', stringUser);
   }
 
   static Future<Users?> loadUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String string_user = prefs.getString('User') ?? "";
-    user = Users.fromJson(jsonDecode(string_user));
+    String stringUser = prefs.getString('User') ?? "";
+    user = Users.fromJson(jsonDecode(stringUser));
     return user;
   }
 
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
-    var _user = {
+    var user0 = {
       "name": user.name,
       "email": user.email,
       "password": user.password,
@@ -42,7 +41,7 @@ class UserRepository {
       "birth": user.birth.toString()
     };
     final ref1 = FirebaseDatabase.instance.ref().child("user");
-    ref1.child(user.name.toString()).set(_user).then((value) {
+    ref1.child(user.name.toString()).set(user0).then((value) {
       print("Thêm tài khoản thành công");
     }).catchError((onError) {
       print('Thêm tài khoản không thành công $onError');
@@ -71,7 +70,7 @@ class UserRepository {
   }
 
   static Future<void> getUser(Users user) async {
-    var _user = {
+    var user0 = {
       "name": user.name,
       "email": user.email,
     };
