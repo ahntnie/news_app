@@ -103,6 +103,26 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
+  void validateEmail() {
+    setState(() {
+      final email = _accountNameController.text.trim();
+      if (email.isEmpty) {
+        _accountNameError = 'Email không được bỏ trống';
+      } else if (!_isValidEmail(email)) {
+        _accountNameError = 'Email không hợp lệ';
+      } else {
+        _accountNameError = '';
+      }
+    });
+  }
+
+  bool _isValidEmail(String email) {
+    // Biểu thức chính quy để kiểm tra định dạng email
+    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
   void validatePassword() {
     setState(() {
       final accountPassword = _passwordController.text.trim();
@@ -193,7 +213,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         child: TextField(
                           controller: _accountNameController,
-                          onChanged: (_) => validateAccountName(),
+                          onChanged: (_) => validateEmail(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             labelText: "Nhập email",
