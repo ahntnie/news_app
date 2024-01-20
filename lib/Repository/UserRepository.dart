@@ -1,27 +1,39 @@
-import '../Model/Users.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:news_app/Model/Users.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 
 class UserRepository {
-  static Users? user = null;
+  static Null user = null;
+  static Users? users;
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
-    var _user = {
+    var user0 = {
       "name": user.name,
       "email": user.email,
       "password": user.password,
       "phone": user.phone,
       "gender": user.gender,
-      "birth": user.birth
+      "birth": user.birth.toString()
     };
-    var ref = await FirebaseDatabase.instance
-        .ref()
-        .child("user")
-        .child(user.phone)
-        .set(_user)
-        .then((value) {
-      print("Thêm thành công");
+    final ref1 = FirebaseDatabase.instance.ref().child("user");
+    ref1.child(user.name.toString()).set(user0).then((value) {
+      print("Thêm tài khoản thành công");
     }).catchError((onError) {
-      print("Thêm thất bại");
+      print('Thêm tài khoản không thành công $onError');
+    });
+  }
+
+  static Future<void> getUserNameandEmail(Users user) async {
+    var user0 = {
+      "name": user.name,
+      "email": user.email,
+    };
+    final ref1 = FirebaseDatabase.instance.ref().child("user");
+    ref1.child(user.name.toString()).get().then((value) {
+      print("lấy tên tài khoản thành công ");
+    }).catchError((onError) {
+      print('lấy tên tài khoản không thành công $onError');
     });
   }
 
@@ -61,7 +73,7 @@ class UserRepository {
 
   static Future<void> getUser(Users user) async {
     // Của Liêm
-    var _user = {
+    var user0 = {
       "name": user.name,
       "email": user.email,
       "password": user.password,

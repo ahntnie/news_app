@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-
-import 'NavigationBarView.dart';
+import 'package:http/http.dart' as http;
+import 'package:news_app/Model/News.dart';
+import 'package:news_app/View/CategoryDetailView.dart';
+import 'package:news_app/View/DrawerView.dart';
+import 'package:news_app/View/NavigationBarView.dart';
+import 'package:rss_dart/domain/rss_feed.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -10,21 +18,57 @@ class NotificationView extends StatefulWidget {
 }
 
 class _NotificationViewState extends State<NotificationView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+   Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
+  final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
+
+  List<News> viewedNews = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
+  }
+
+  Future<RssFeed> _fetchRssFeed() async {
+    final response = await http.get(Uri.parse(rssUrl));
+    if (response.statusCode == 200) {
+      return RssFeed.parse(response.body);
+    } else {
+      throw Exception('Failed to fetch RSS feed');
+    }
+  }
+
+  String _getFormattedDateTime(String dateTimeString) {
+    final format = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z');
+    final dateTime = format.parse(dateTimeString);
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:$minute';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const BottomNav(
-        idx: 1,
-      ),
+      extendBody: true,
       appBar: AppBar(
-        // leading: IconButton(
-        //   icon: const Icon(
-        //     Icons.arrow_back_ios_rounded,
-        //     color: Colors.black,
-        //     size: 40,
-        //   ),
-        //   onPressed: () {},
-        // ),
         title: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -32,7 +76,7 @@ class _NotificationViewState extends State<NotificationView> {
             borderRadius: BorderRadius.circular(20),
           ),
           width: MediaQuery.of(context).size.width / 2.2,
-          height: 50,
+          height: 40,
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -40,582 +84,226 @@ class _NotificationViewState extends State<NotificationView> {
               Text(
                 "Tin tức",
                 style: TextStyle(color: Colors.blue),
-              ),
+              )
             ],
           ),
         ),
         centerTitle: true,
       ),
+      drawer: const DrawerView(),
       body: DefaultTabController(
         length: 3,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            const SliverAppBar(
-              automaticallyImplyLeading: false,
-              pinned: true,
-              floating: true,
-              title: TabBar(
-                indicator: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(color: Colors.blue, width: 4))),
-                tabs: [
-                  Tab(text: 'Thông báo'),
-                  Tab(text: 'Phản hồi bình luận'),
-                  Tab(text: 'Tin đã xem'),
+        child: Column(
+          children: [
+            const TabBar(
+              tabs: [
+                Tab(text: 'Tin mới nhất'),
+                Tab(text: 'Phản hồi bình luận'),
+                Tab(text: 'Tin đã xem'),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _TabNotification(),
+                  _TabComment(),
+                  _TabStoryAgain(),
                 ],
               ),
             ),
           ],
-          body: TabBarView(
-            children: [
-              // TAB Thông báo
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 20, top: 5),
-                        child: Text(
-                          "Nghệ thuật",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, left: 20, right: 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                alignment: Alignment.topLeft,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey.shade400,
-                                    width: 2.0,
-                                  ),
-                                  color: Colors.grey.shade400,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height / 5.5,
-                                child: const Padding(
-                                  padding: EdgeInsets.only(left: 10, top: 20),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 200),
-                                child: Text(
-                                  "2h trước",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red.shade900,
-                                  ),
-                                ),
-                              ),
-                              const Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  "Thể thao",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.topLeft,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade400,
-                                        width: 2.0,
-                                      ),
-                                      color: Colors.grey.shade400,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height /
-                                        5.5,
-                                    child: const Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, top: 20),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 200),
-                                    child: Text(
-                                      "2h trước",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red.shade900,
-                                      ),
-                                    ),
-                                  ),
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, top: 5),
-                                      child: Text(
-                                        "Thời sự",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SingleChildScrollView(
-                                    child: Container(
-                                      alignment: Alignment.topLeft,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
-                                          width: 2.0,
-                                        ),
-                                        color: Colors.grey.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      width: MediaQuery.of(context).size.width,
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              5.5,
-                                      child: const Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 10, top: 20),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 200),
-                                    child: Text(
-                                      "2h trước",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red.shade900,
-                                      ),
-                                    ),
-                                  ),
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, top: 5),
-                                      child: Text(
-                                        "Bất động sản",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SingleChildScrollView(
-                                    child: Container(
-                                      alignment: Alignment.topLeft,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
-                                          width: 2.0,
-                                        ),
-                                        color: Colors.grey.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      width: MediaQuery.of(context).size.width,
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              5.5,
-                                      child: const Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 10, top: 20),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 200),
-                                    child: Text(
-                                      "2h trước",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red.shade900,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // TAB Phản hồi bình luận
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SingleChildScrollView(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, left: 20, right: 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                alignment: Alignment.topLeft,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey.shade400,
-                                    width: 2.0,
-                                  ),
-                                  color: Colors.grey.shade400,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height / 5.5,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 250, top: 75),
-                                  child: Text(
-                                    "2h trước",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.red.shade900,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.topLeft,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
-                                          width: 2.0,
-                                        ),
-                                        color: Colors.grey.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      width: MediaQuery.of(context).size.width,
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              5.5,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 250, top: 75),
-                                        child: Text(
-                                          "2h trước",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red.shade900,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SingleChildScrollView(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Container(
-                                          alignment: Alignment.topLeft,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.grey.shade400,
-                                              width: 2.0,
-                                            ),
-                                            color: Colors.grey.shade400,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              5.5,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 250, top: 75),
-                                            child: Text(
-                                              "2h trước",
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red.shade900,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SingleChildScrollView(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Container(
-                                          alignment: Alignment.topLeft,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.grey.shade400,
-                                              width: 2.0,
-                                            ),
-                                            color: Colors.grey.shade400,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              5.5,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 250, top: 75),
-                                            child: Text(
-                                              "2h trước",
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red.shade900,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              //Tab Tin đã xem
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 20, top: 10),
-                        child: Text(
-                          "Nghệ thuật",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 200),
-                      child: Text(
-                        "2h trước",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red.shade900,
-                        ),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, left: 20, right: 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                alignment: Alignment.topLeft,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey.shade400,
-                                    width: 2.0,
-                                  ),
-                                  color: Colors.grey.shade400,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height / 5.5,
-                                child: const Padding(
-                                  padding: EdgeInsets.only(left: 10, top: 20),
-                                ),
-                              ),
-                              const Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  "Thể thao",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 200),
-                                child: Text(
-                                  "2h trước",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red.shade900,
-                                  ),
-                                ),
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.topLeft,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade400,
-                                        width: 2.0,
-                                      ),
-                                      color: Colors.grey.shade400,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height /
-                                        5.5,
-                                    child: const Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, top: 20),
-                                    ),
-                                  ),
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, top: 5),
-                                      child: Text(
-                                        "Thời sự",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 200),
-                                    child: Text(
-                                      "2h trước",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red.shade900,
-                                      ),
-                                    ),
-                                  ),
-                                  SingleChildScrollView(
-                                    child: Container(
-                                      alignment: Alignment.topLeft,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
-                                          width: 2.0,
-                                        ),
-                                        color: Colors.grey.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      width: MediaQuery.of(context).size.width,
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              5.5,
-                                      child: const Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 10, top: 20),
-                                      ),
-                                    ),
-                                  ),
-                                  const SingleChildScrollView(
-                                    child: Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 10, top: 5),
-                                        child: Text(
-                                          "Bất động sản",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 200),
-                                    child: Text(
-                                      "2h trước",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red.shade900,
-                                      ),
-                                    ),
-                                  ),
-                                  SingleChildScrollView(
-                                    child: Container(
-                                      alignment: Alignment.topLeft,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
-                                          width: 2.0,
-                                        ),
-                                        color: Colors.grey.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      width: MediaQuery.of(context).size.width,
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              5.5,
-                                      child: const Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 10, top: 20),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
+      bottomNavigationBar: const BottomNav(idx: 1),
+    );
+  }
+
+  Widget _TabNotification() {
+    return FutureBuilder<RssFeed>(
+      future: _fetchRssFeed(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final rssFeed = snapshot.data!;
+          return ListView.builder(
+            itemCount: rssFeed.items.length,
+            itemBuilder: (context, index) {
+              final rssItem = rssFeed.items[index];
+              final pubDate = _getFormattedDateTime(rssItem.pubDate ?? '');
+              final umllink = rssItem.link ?? '';
+              final htmlContent = rssItem.description;
+              final tittle1 = rssItem.title;
+              var img = "";
+              if (rssItem.description.toString().contains("img src=")) {
+                img = rssItem.description.toString().substring(
+                    rssItem.description.toString().lastIndexOf('img src=') + 9,
+                    rssItem.description.toString().lastIndexOf('>') - 11);
+              }
+              if (img.isNotEmpty) {
+                News(
+                  title: tittle1.toString(),
+                  description: htmlContent.toString(),
+                  img: img,
+                  urlHtml: umllink,
+                  category: "Tin mới",
+                );
+                return GestureDetector(
+                  onTap: () async {
+                    print(umllink);
+                    setState(() {
+                      viewedNews.add(News(
+                        title: tittle1.toString(),
+                        description: htmlContent.toString(),
+                        img: img,
+                        urlHtml: umllink,
+                        category: "Tin mới",
+                      ));
+                      saveViewedNews(viewedNews);
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryDetailView(
+                          news: News(
+                            title: rssItem.title.toString(),
+                            description: htmlContent.toString(),
+                            img: img,
+                            urlHtml: umllink,
+                            category: "Tin mới",
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  child: SizedBox(
+                    child: Container(
+                      margin: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 3.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            rssItem.title ?? '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Html(
+                            data: rssItem.description ?? '',
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            'Thời gian cập nhật: $pubDate',
+                            style: const TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return const Text("");
+              }
+            },
+          );
+        } else if (snapshot.hasError) {
+          Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
+  Widget _TabComment() {
+    return const Center(
+      child: Text('Phản hồi bình luận'),
+    );
+  }
+
+  Widget _TabStoryAgain() {
+    void desc = "";
+    if (viewedNews.isEmpty) {
+      return const Center(
+        child: Text('Không có tin đã xem'),
+      );
+    }
+    return ListView.builder(
+      itemCount: viewedNews.length,
+      itemBuilder: (context, index) {
+        final news = viewedNews[viewedNews.length - index - 1];
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CategoryDetailView(
+                  news: news,
+                ),
+              ),
+            );
+          },
+          child: SizedBox(
+            child: Container(
+              margin: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 3.0,
+                ),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    news.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Image.network(news.img),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    // ignore: void_checks
+                    desc = news.description.toString().substring(
+                        news.description.toString().lastIndexOf('>') + 1),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    'Danh mục: ${news.category}',
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

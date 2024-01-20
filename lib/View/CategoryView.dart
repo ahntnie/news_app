@@ -1,13 +1,14 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../Model/Category.dart';
 import '../Model/News.dart';
 import '../Presenter/NewsPresenter.dart';
 import 'CategoryDetailView.dart';
@@ -30,10 +31,32 @@ List<News> lstNews = List.filled(
 bool shorten = false;
 
 class _CategoryViewState extends State<CategoryView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+  Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
+  List<News> viewedNews = [];
   @override
   void initState() {
     super.initState();
     Load();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
   }
 
   String name = "";
@@ -41,6 +64,7 @@ class _CategoryViewState extends State<CategoryView> {
     if (name != widget.name) {
       print("new");
       name = widget.name;
+
       lstNews = List.filled(0,
           News(title: "", description: "", img: "", urlHtml: "", category: ""),
           growable: true);
@@ -321,7 +345,7 @@ Widget buildImage(
 
 class CategoryTile extends StatelessWidget {
   final image, categoryName;
-  CategoryTile({this.categoryName, this.image});
+  const CategoryTile({super.key, this.categoryName, this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -397,6 +421,9 @@ Row titleCategory(String name) {
 ListTile newsCard(BuildContext context, News news) {
   return ListTile(
     onTap: () {
+      viewedNews.add(news);
+      saveViewedNews(viewedNews);
+      print("đã lưu");
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => CategoryDetailView(news: news)));
     },
@@ -447,3 +474,21 @@ ListTile newsCard(BuildContext context, News news) {
     ),
   );
 }
+
+Future<void> saveViewedNews(List<News> viewedNews) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String> viewedNewsJsonList =
+      viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+  await prefs.setStringList('viewedNews', viewedNewsJsonList);
+}
+
+Future<List<News>> loadViewedNews() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+  List<News> viewedNews = viewedNewsJsonList
+      .map((json) => News.fromJson(jsonDecode(json)))
+      .toList();
+  return viewedNews;
+}
+
+List<News> viewedNews = [];

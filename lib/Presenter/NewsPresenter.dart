@@ -1,6 +1,5 @@
 import 'package:news_app/Repository/NewsRepository.dart';
 
-import '../Model/News.dart';
 
 class NewsPresenter {
   static Future<void> getNews() async {
@@ -21,5 +20,9 @@ class NewsPresenter {
 
   static Future<void> getNews_NgheThuat() async {
     return await NewsRepository.getNews_NgheThuat();
+  }
+
+  static Future<void> searchNews(String stringNews) async {
+    return await NewsRepository.searchNews(stringNews);
   }
 }

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/Model/Users.dart';
-import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/View/HomeView.dart';
 
 class StartView extends StatefulWidget {
@@ -15,7 +13,7 @@ class _StartViewState extends State<StartView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // UserPresenter.getUser(Users(
+    // UserPresenter.getUsers(User(
     //     name: "Lê Hữu Thành",
     //     email: "thanh@gmail.com",
     //     password: "123",
@@ -64,6 +62,7 @@ class _StartViewState extends State<StartView> {
                             borderRadius: BorderRadius.circular(10)),
                         child: TextButton(
                             onPressed: () {
+                              Navigator.pop(context);
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

@@ -1,15 +1,10 @@
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/widgets.dart';
-import 'package:news_app/Model/Users.dart';
-import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/UserRepository.dart';
+import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 
 class ProfileView extends StatefulWidget {
@@ -26,14 +21,14 @@ class _ProfileViewState extends State<ProfileView> {
   bool isShowPhoneNum = false;
   bool isShowGender = false;
   bool isShowBirth = false;
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController gender = TextEditingController();
   TextEditingController birth = TextEditingController();
-
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   String nameError = '';
   String emailError = '';
   String passwordError = '';
@@ -41,18 +36,13 @@ class _ProfileViewState extends State<ProfileView> {
   String phoneError = '';
   String birthError = '';
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
-    UserRepository.user = null;
+    UserRepository.users = null;
+    
     print('Đã đăng xuất');
   }
-
-  
-
   void updateUser() {
     
   }
@@ -92,9 +82,20 @@ class _ProfileViewState extends State<ProfileView> {
                   ]),
                   Column(
                     children: [
-                      const Text("Nguyễn Văn A"),
+                      const Text(
+                        "userName",
+                        style: TextStyle(color: Colors.black),
+                      ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          //
+                          _signOut();
+                          // Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginView()));
+                        },
                         child: const Text(
                           "Đăng xuất",
                           style: TextStyle(color: Colors.black),
@@ -321,15 +322,15 @@ class _ProfileViewState extends State<ProfileView> {
                                 context: context,
                                 builder: (context) {
                                   return Dialog(
-                                    child: Container(
+                                    child: SizedBox(
                                       width: double.infinity,
                                       height: 150,
                                       child: Padding(
-                                        padding: EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(5),
                                         child: Column(
                                           children: [
                                             RadioListTile(
-                                              title: Text("Nam"),
+                                              title: const Text("Nam"),
                                               value: false,
                                               groupValue: gender,
                                               onChanged: (value) {
@@ -341,7 +342,7 @@ class _ProfileViewState extends State<ProfileView> {
                                               },
                                             ),
                                             RadioListTile(
-                                              title: Text("Nữ"),
+                                              title: const Text("Nữ"),
                                               value: true,
                                               groupValue: gender,
                                               onChanged: (value) {
@@ -463,5 +464,10 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
         ));
+  }
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<FirebaseAuth>('_auth', _auth));
   }
 }

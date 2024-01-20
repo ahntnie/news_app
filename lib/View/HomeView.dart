@@ -1,9 +1,7 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Model/News.dart';
 import 'package:news_app/Presenter/NewsPresenter.dart';
@@ -11,9 +9,9 @@ import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:video_player/video_player.dart';
 
 import '../Model/Category.dart';
 import 'NavigationBarView.dart';
@@ -61,21 +59,38 @@ double size(BuildContext context, int baseSize) {
   return baseSize * (screenSize / baseScreenSize);
 }
 
-Future<void> PhatVideo() async {
-  final ref = FirebaseStorage.instance.ref('vidoe đồ án .mp4');
-  final url = await ref.getDownloadURL();
-  final controller = VideoPlayerController.networkUrl(Uri.parse(url));
-  controller.initialize();
-  controller.play();
-  video = Center(
-    child: AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: VideoPlayer(controller),
-    ),
-  );
-}
+// Future<void> PhatVideo() async {
+//   final ref = FirebaseStorage.instance.ref('vidoe đồ án .mp4');
+//   final url = await ref.getDownloadURL();
+//   final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+//   controller.initialize();
+//   controller.play();
+//   video = Center(
+//     child: AspectRatio(
+//       aspectRatio: controller.value.aspectRatio,
+//       child: VideoPlayer(controller),
+//     ),
+//   );
+// }
 
 class _HomeViewState extends State<HomeView> {
+  Future<void> saveViewedNews(List<News> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList =
+        viewedNews.map((news) => jsonEncode(news.toJson())).toList();
+    await prefs.setStringList('viewedNews', viewedNewsJsonList);
+  }
+
+  Future<List<News>> loadViewedNews() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
+    List<News> viewedNews = viewedNewsJsonList
+        .map((json) => News.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNews;
+  }
+
+  List<News> viewedNews = [];
   // @override
   // void initState() {
   //   PhatVideo();
@@ -96,22 +111,37 @@ class _HomeViewState extends State<HomeView> {
   static List<News> lstNews_NgheThuat = List.filled(
       0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
       growable: true);
+  static List<News> lstViewedNews = List.filled(
+      0, News(title: "", description: "", img: "", urlHtml: "", category: ""),
+      growable: true);
   @override
   void initState() {
     super.initState();
     Load();
+    loadViewedNews().then((newsList) {
+      setState(() {
+        viewedNews = newsList;
+      });
+    });
   }
 
   Load() async {
-    NewsPresenter.getNews().then((value) {
-      setState(() {
-        lstNews = NewsRepository.lstNews;
-        lstNews_ThoiSu = NewsRepository.lstNews_ThoiSu;
-        lstNews_TheThao = NewsRepository.lstNews_TheThao;
-        lstNews_GiaoDuc = NewsRepository.lstNews_GiaoDuc;
-        lstNews_NgheThuat = NewsRepository.lstNews_NgheThuat;
+    if ((lstNews.isEmpty ||
+        lstNews_GiaoDuc.isEmpty ||
+        lstNews_NgheThuat.isEmpty ||
+        lstNews_TheThao.isEmpty ||
+        lstNews_ThoiSu.isEmpty)) {
+      NewsPresenter.getNews().then((value) {
+        setState(() {
+          lstNews = NewsRepository.lstNews;
+          lstNews_ThoiSu = NewsRepository.lstNews_ThoiSu;
+          lstNews_TheThao = NewsRepository.lstNews_TheThao;
+          lstNews_GiaoDuc = NewsRepository.lstNews_GiaoDuc;
+          lstNews_NgheThuat = NewsRepository.lstNews_NgheThuat;
+          lstViewedNews = NewsRepository.lstViewedNews;
+        });
       });
-    });
+    }
   }
 
   double FontSize(double value, BuildContext context) {
@@ -127,33 +157,12 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    if (lstNews.isEmpty ||
+    Load();
+    if (!(lstNews.isEmpty ||
         lstNews_GiaoDuc.isEmpty ||
         lstNews_NgheThuat.isEmpty ||
         lstNews_TheThao.isEmpty ||
-        lstNews_ThoiSu.isEmpty) {
-      Load();
-      return Center(
-        child: Stack(
-          children: [
-            SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Image.asset(
-                  "assets/image/iconNews.jpg",
-                  fit: BoxFit.fill,
-                )),
-            Padding(
-              padding: const EdgeInsets.only(top: 400),
-              child: LoadingAnimationWidget.hexagonDots(
-                color: Colors.grey,
-                size: 50,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
+        lstNews_ThoiSu.isEmpty)) {
       return SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -202,6 +211,7 @@ class _HomeViewState extends State<HomeView> {
                     itemCount: lstNews.length,
                     itemBuilder: (context, index, realIndex) {
                       final news = lstNews[index].img;
+
                       return buildImage(news, index, lstNews[index], context);
                     },
                     options: CarouselOptions(
@@ -303,58 +313,113 @@ class _HomeViewState extends State<HomeView> {
               idx: 0,
             )),
       );
+    } else {
+      return SafeArea(
+          child: Scaffold(
+        appBar: AppBar(
+          title: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            width: MediaQuery.of(context).size.width / 2.2,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("VLTT "),
+                Text(
+                  "Tin tức",
+                  style: TextStyle(color: Colors.blue),
+                )
+              ],
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Stack(
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Image.asset(
+                    "assets/image/iconNews.jpg",
+                    fit: BoxFit.fill,
+                  )),
+              Padding(
+                padding: const EdgeInsets.only(top: 400),
+                child: LoadingAnimationWidget.hexagonDots(
+                  color: Colors.grey,
+                  size: 50,
+                ),
+              ),
+            ],
+          ),
+        ),
+        drawer: const DrawerView(),
+        bottomNavigationBar: const BottomNav(idx: 0),
+      ));
     }
   }
 
-  ListTile newsCard(BuildContext context, News news) {
-    return ListTile(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CategoryDetailView(news: news)));
-      },
-      title: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.grey.shade200,
-        ),
-        width: double.infinity,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 100,
-              height: 100,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Image.network(
-                  news.img,
-                  fit: BoxFit.cover,
+  Padding newsCard(BuildContext context, News news) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            viewedNews.add(news);
+            saveViewedNews(viewedNews);
+            print("đã lưu");
+          });
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CategoryDetailView(news: news)));
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.grey.shade200,
+          ),
+          width: double.infinity,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  child: Image.network(
+                    news.img,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 5.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      news.title,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        news.title,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      news.description,
-                      style: const TextStyle(
-                        fontSize: 8,
-                      ),
-                    )
-                  ],
+                      Text(
+                        news.description,
+                        style: const TextStyle(
+                          fontSize: 8,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -413,15 +478,18 @@ class _HomeViewState extends State<HomeView> {
 
 Widget buildImage(
         String assetImage, int index, News news, BuildContext context) =>
-    ListTile(
+    InkWell(
       onTap: () {
+        viewedNews.add(news);
+        saveViewedNews(viewedNews);
+        print("đã lưu");
         Navigator.popUntil(context, (route) => route.isFirst);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => CategoryDetailView(
                   news: news,
                 )));
       },
-      title: Stack(children: [
+      child: Stack(children: [
         SizedBox(
           width: double.infinity,
           child: ClipRRect(
