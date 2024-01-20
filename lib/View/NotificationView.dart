@@ -140,6 +140,9 @@ class _NotificationViewState extends State<NotificationView> {
                     rssItem.description.toString().lastIndexOf('>') - 11);
               }
               if (img.isNotEmpty) {
+                bool isViewed =
+                    viewedNews.any((news) => news.urlHtml == umllink);
+
                 News(
                   title: tittle1.toString(),
                   description: htmlContent.toString(),
@@ -150,16 +153,18 @@ class _NotificationViewState extends State<NotificationView> {
                 return GestureDetector(
                   onTap: () async {
                     print(umllink);
-                    setState(() {
-                      viewedNews.add(News(
-                        title: tittle1.toString(),
-                        description: htmlContent.toString(),
-                        img: img,
-                        urlHtml: umllink,
-                        category: "Tin mới",
-                      ));
-                      saveViewedNews(viewedNews);
-                    });
+                    if (!isViewed) {
+                      setState(() {
+                        viewedNews.add(News(
+                          title: tittle1.toString(),
+                          description: htmlContent.toString(),
+                          img: img,
+                          urlHtml: umllink,
+                          category: "Tin mới",
+                        ));
+                        saveViewedNews(viewedNews);
+                      });
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(
