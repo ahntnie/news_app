@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
-import 'package:news_app/Presenter/CommentPresenter.dart';
-import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/DrawerView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
@@ -14,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class NotificationView extends StatefulWidget {
+  const NotificationView({super.key});
+
   @override
   State<NotificationView> createState() => _NotificationViewState();
 }
@@ -283,7 +283,7 @@ class _NotificationViewState extends State<NotificationView> {
                     ),
                   ),
                   const SizedBox(height: 8.0),
-                  Image.network("${news.img}"),
+                  Image.network(news.img),
                   const SizedBox(
                     height: 10,
                   ),

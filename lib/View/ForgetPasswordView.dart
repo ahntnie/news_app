@@ -95,7 +95,7 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height / 2.4,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 10, top: 20),
+                      padding: const EdgeInsets.only(left: 10, top: 20),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -225,7 +225,7 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Đóng'),
+              child: const Text('Đóng'),
             ),
           ],
         );

@@ -322,7 +322,7 @@ class NewsRepository {
   }
 
   ///Tìm kiếm
-  static Future<void> searchNews(String string_news) async {
+  static Future<void> searchNews(String stringNews) async {
     final client = http.Client();
     String img;
     String desc;
@@ -349,7 +349,7 @@ class NewsRepository {
           if (channel.items[index].title
               .toString()
               .toLowerCase()
-              .contains(string_news.toString().toLowerCase())) {
+              .contains(stringNews.toString().toLowerCase())) {
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()
@@ -397,7 +397,7 @@ class NewsRepository {
           if (channel.items[index].title
               .toString()
               .toLowerCase()
-              .contains(string_news.toString().toLowerCase())) {
+              .contains(stringNews.toString().toLowerCase())) {
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()
@@ -443,7 +443,7 @@ class NewsRepository {
           if (channel.items[index].title
               .toString()
               .toLowerCase()
-              .contains(string_news.toString().toLowerCase())) {
+              .contains(stringNews.toString().toLowerCase())) {
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()
@@ -489,7 +489,7 @@ class NewsRepository {
           if (channel.items[index].title
               .toString()
               .toLowerCase()
-              .contains(string_news.toString().toLowerCase())) {
+              .contains(stringNews.toString().toLowerCase())) {
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()
@@ -535,7 +535,7 @@ class NewsRepository {
           if (channel.items[index].title
               .toString()
               .toLowerCase()
-              .contains(string_news.toString().toLowerCase())) {
+              .contains(stringNews.toString().toLowerCase())) {
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()
