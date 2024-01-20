@@ -10,6 +10,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:news_app/Model/News.dart';
 import 'package:news_app/Presenter/NewsPresenter.dart';
 import 'package:news_app/Repository/NewsRepository.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/DrawerView.dart';
@@ -146,6 +147,7 @@ class _HomeViewState extends State<HomeView> {
           lstViewedNews = NewsRepository.lstViewedNews;
         });
       });
+
     }
   }
 
