@@ -65,19 +65,22 @@ class _DrawerViewState extends State<DrawerView> {
                       ),
                       suffixIcon: IconButton(
                           onPressed: () {
-                            if (txt_Search.text.isEmpty) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomeView()));
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SearchView(
-                                            string_news: txt_Search.text,
-                                          )));
-                            }
+                            setState(() {
+                              if (txt_Search.text.isEmpty) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const HomeView()));
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SearchView(
+                                              string_news: txt_Search.text,
+                                            )));
+                              }
+                            });
                           },
                           icon: const Icon(Icons.search)),
                     ),

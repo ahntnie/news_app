@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Model/News.dart';
 import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';

@@ -8,6 +8,7 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Model/User.dart';
 import 'package:news_app/Presenter/CommentPresenter.dart';
 import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
@@ -15,7 +16,6 @@ import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/LoginView.dart';
-import 'package:sizer/sizer.dart';
 
 class CategoryDetailView extends StatefulWidget {
   const CategoryDetailView({
@@ -28,9 +28,6 @@ class CategoryDetailView extends StatefulWidget {
 }
 
 final FirebaseAuth auth = FirebaseAuth.instance;
-// String? name = FirebaseAuth.instance.currentUser!.displayName;
-// String? avatar = FirebaseAuth.instance.currentUser!.photoURL;
-User? _currentUser = auth.currentUser;
 
 class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
@@ -52,7 +49,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   bool flag1 = true;
-  int count = 0;
+  int countt = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -60,6 +57,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       );
       lstGetCmt.add(comment);
       CommentRepository.lstComments = lstGetCmt;
+    });
+  }
+
+  void likeComment(Comment cmt) {
+    setState(() {
+      if (countt == 0) {
+        countt = 1;
+        cmt.like = countt;
+      } else if (countt == 1) {
+        countt = 0;
+        print("đếm $countt");
+        cmt.like = countt;
+      }
     });
   }
 
@@ -107,7 +117,23 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500),
                                 ),
-                                Text(cmt.time.toString())
+                                Text(cmt.time)
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(left: 100),
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    likeComment(cmt);
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: cmt.like != 0 ? Colors.red : null,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -116,52 +142,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                child: Text(
-                                  cmt.content,
-                                ),
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                cmt.content,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  // cmt.like.toString();
-                                },
-                                icon: const Icon(Icons.thumb_up),
-                              ),
-                              // Text("${count}")
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  // _decrementCount();
-                                  // print(count);
-                                },
-                                icon: const Icon(Icons.thumb_down),
-                              ),
-                              // Text("${count}")
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: Text(
-                              "Trả lời",
-                              style: TextStyle(color: Colors.blue.shade400),
                             ),
                           ),
                         ],
@@ -175,8 +161,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     );
   }
 
-  int minHeightt = 10;
-  int minHeight = 100;
   final cmt = TextEditingController();
   String gmtt = "";
   List<String> descriptions = [];
@@ -189,7 +173,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   void initState() {
     super.initState();
     fetchData();
-    getComment();
+
     CommentRepository.lstComments = List.filled(
         0,
         Comment(
@@ -248,9 +232,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    getComment();
     int count = 0;
     int count1 = 0;
-    getComment();
+
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -387,6 +372,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                               ),
                                               TextButton(
                                                 onPressed: () {
+                                                  Navigator.pop(context);
                                                   // Chuyển sang tap đăng nhập khi chưa đăng nhập
                                                   Navigator.of(context).push(
                                                       MaterialPageRoute(
@@ -408,22 +394,27 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
-                                      time: DateTime.now().toString(),
-                                      nameUser:
-                                         UserRepository.user!.displayName.toString(),
+                                      like: countt,
+                                      time: DateTime.now()
+                                          .toString()
+                                          .substring(0, 19),
+                                      nameUser: UserRepository.user!.displayName
+                                          .toString(),
                                       title: widget.news.title,
                                     ));
                                     addComment(Comment(
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
-                                      like: 0,
-                                      time: DateTime.now().toString(),
-                                      nameUser:
-                                           UserRepository.user!.displayName.toString(),
+                                      like: countt,
+                                      time: DateTime.now()
+                                          .toString()
+                                          .substring(0, 19),
+                                      nameUser: UserRepository.user!.displayName
+                                          .toString(),
                                       title: widget.news.title,
                                     ));
+                                    cmt.clear();
                                   } else {
                                     showDialog(
                                       context: context,

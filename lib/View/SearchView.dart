@@ -19,6 +19,7 @@ List<News> lstSearchNews = List.filled(
 class _SearchViewState extends State<SearchView> {
   @override
   void initState() {
+    NewsRepository.lstSearchNews.clear();
     // TODO: implement initState
     super.initState();
     load();
@@ -34,28 +35,54 @@ class _SearchViewState extends State<SearchView> {
   }
 
   @override
+  void dispose() {
+    Navigator.pop(context);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     print(widget.string_news);
     load();
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(20),
+    return lstSearchNews.isNotEmpty
+        ? SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                title: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    width: MediaQuery.of(context).size.width / 2.2,
+                    child: const Text("Tìm kiếm")),
+                centerTitle: true,
               ),
-              width: MediaQuery.of(context).size.width / 2.2,
-              child: const Text("Tìm kiếm")),
-          centerTitle: true,
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-              children:
-                  lstSearchNews.map((e) => newsCard(context, e)).toList()),
-        ),
-      ),
-    );
+              body: SingleChildScrollView(
+                child: Column(
+                    children: lstSearchNews
+                        .map((e) => newsCard(context, e))
+                        .toList()),
+              ),
+            ),
+          )
+        : SafeArea(
+            child: Scaffold(
+                appBar: AppBar(
+                  title: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      width: MediaQuery.of(context).size.width / 2.2,
+                      child: const Text("Tìm kiếm")),
+                  centerTitle: true,
+                ),
+                body: const Center(
+                    child: Text(
+                  "Đang tìm ....",
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ))));
   }
 }

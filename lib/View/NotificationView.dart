@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Presenter/CommentPresenter.dart';
+import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/DrawerView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
@@ -23,7 +26,7 @@ class _NotificationViewState extends State<NotificationView> {
     await prefs.setStringList('viewedNews', viewedNewsJsonList);
   }
 
-   Future<List<News>> loadViewedNews() async {
+  Future<List<News>> loadViewedNews() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> viewedNewsJsonList = prefs.getStringList('viewedNews') ?? [];
     List<News> viewedNews = viewedNewsJsonList
@@ -96,7 +99,7 @@ class _NotificationViewState extends State<NotificationView> {
             const TabBar(
               tabs: [
                 Tab(text: 'Tin mới nhất'),
-                Tab(text: 'Phản hồi bình luận'),
+                Tab(text: 'Bình luận'),
                 Tab(text: 'Tin đã xem'),
               ],
             ),
@@ -229,9 +232,12 @@ class _NotificationViewState extends State<NotificationView> {
 
   Widget _TabComment() {
     return const Center(
-      child: Text('Phản hồi bình luận'),
+      child: Text('Không có bình luận'),
     );
   }
+
+  List<Widget> lstComment = [];
+  List<Comment> lstGetCmt = [];
 
   Widget _TabStoryAgain() {
     void desc = "";
