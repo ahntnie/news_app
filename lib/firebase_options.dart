@@ -49,6 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '194149615725',
     projectId: 'newsapp-ab733',
     authDomain: 'newsapp-ab733.firebaseapp.com',
+    databaseURL: 'https://newsapp-ab733-default-rtdb.firebaseio.com',
     storageBucket: 'newsapp-ab733.appspot.com',
   );
 
@@ -57,6 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:194149615725:android:a31b0cf8ed84225c375764',
     messagingSenderId: '194149615725',
     projectId: 'newsapp-ab733',
+    databaseURL: 'https://newsapp-ab733-default-rtdb.firebaseio.com',
     storageBucket: 'newsapp-ab733.appspot.com',
   );
 
@@ -65,7 +67,10 @@ class DefaultFirebaseOptions {
     appId: '1:194149615725:ios:415067beda5b0d14375764',
     messagingSenderId: '194149615725',
     projectId: 'newsapp-ab733',
+    databaseURL: 'https://newsapp-ab733-default-rtdb.firebaseio.com',
     storageBucket: 'newsapp-ab733.appspot.com',
+    androidClientId: '194149615725-54gtiiq7porvea91msno8439ihn469ha.apps.googleusercontent.com',
+    iosClientId: '194149615725-urh7vnml3nnu4ll9k6fhksl054lqlfqc.apps.googleusercontent.com',
     iosBundleId: 'com.example.newsApp',
   );
 
@@ -74,7 +79,10 @@ class DefaultFirebaseOptions {
     appId: '1:194149615725:ios:022853bcecdfd63e375764',
     messagingSenderId: '194149615725',
     projectId: 'newsapp-ab733',
+    databaseURL: 'https://newsapp-ab733-default-rtdb.firebaseio.com',
     storageBucket: 'newsapp-ab733.appspot.com',
+    androidClientId: '194149615725-54gtiiq7porvea91msno8439ihn469ha.apps.googleusercontent.com',
+    iosClientId: '194149615725-ciokehsepeer39utkmei657utdhe31ag.apps.googleusercontent.com',
     iosBundleId: 'com.example.newsApp.RunnerTests',
   );
 }

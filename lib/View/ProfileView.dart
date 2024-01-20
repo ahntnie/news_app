@@ -21,14 +21,17 @@ class _ProfileViewState extends State<ProfileView> {
   bool isShowPhoneNum = false;
   bool isShowGender = false;
   bool isShowBirth = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController gender = TextEditingController();
   TextEditingController birth = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   String nameError = '';
   String emailError = '';
   String passwordError = '';
@@ -40,11 +43,13 @@ class _ProfileViewState extends State<ProfileView> {
     await _googleSignIn.signOut();
     await _auth.signOut();
     UserRepository.users = null;
-    
     print('Đã đăng xuất');
   }
-  void updateUser() {
-    
+
+  void loadUser() {
+    name = _auth.currentUser!.displayName as TextEditingController;
+    phone = _auth.currentUser!.phoneNumber as TextEditingController;
+    email = _auth.currentUser!.email as TextEditingController;
   }
 
   // Bỏ kiểm tra Email
@@ -465,6 +470,7 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ));
   }
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
