@@ -1,6 +1,6 @@
 class Users {
   final String name;
-  final String email;
+  final String? email;
   final String phone;
   final DateTime birth;
   final String password;

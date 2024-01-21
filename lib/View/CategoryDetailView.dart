@@ -32,7 +32,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     //lstComment
     //print("Vào get nè");
     setState(() {
-      print(widget.news.title.toString());
+      //print(widget.news.title.toString());
       CommentPresenter.getComment(
         widget.news.title.toString(),
       ).then((value) {
@@ -65,10 +65,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     for (var _cmt in ref.children) {
       List<String> lstLike = [];
       if (cmt.time == _cmt.child("time").value.toString()) {
-        for (var cm in _cmt.child("lstLike").children) {
-          lstLike.add(cm.value.toString());
+        print("số like: ${_cmt.child("lstLike").children.length}");
+        for (var count = 0;
+            count < _cmt.child("lstLike").children.length;
+            count++) {
+          lstLike.add(
+              _cmt.child("lstLike").child(count.toString()).value.toString());
         }
-        lstLike.add(UserRepository.user!.email.toString());
+        if (lstLike.contains(UserRepository.user.email.toString())) {
+          lstLike.remove(UserRepository.user.email.toString());
+        } else {
+          lstLike.add(UserRepository.user.email.toString());
+        }
+        print("Lstlike: ${lstLike.length}");
         var ref1 = await FirebaseDatabase.instance
             .ref()
             .child("comment")
@@ -143,7 +152,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                    if (UserRepository.user == null) {
+                                    print(
+                                        "a${UserRepository.user.email.toString()}a");
+                                    if (UserRepository.user.email!.isEmpty) {
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
@@ -410,7 +421,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
-                                if (UserRepository.user == null) {
+                                if (UserRepository.user.email!.isEmpty) {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -455,24 +466,24 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       lstLike: [],
                                       content: cmt.text,
                                       email:
-                                          UserRepository.user!.email.toString(),
+                                          UserRepository.user.email.toString(),
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
                                       nameUser:
-                                          UserRepository.user!.name.toString(),
+                                          UserRepository.user.name.toString(),
                                       title: widget.news.title,
                                     ));
                                     addComment(Comment(
                                       lstLike: [],
                                       content: cmt.text,
                                       email:
-                                          UserRepository.user!.email.toString(),
+                                          UserRepository.user.email.toString(),
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
                                       nameUser:
-                                          UserRepository.user!.name.toString(),
+                                          UserRepository.user.name.toString(),
                                       title: widget.news.title,
                                     ));
                                     cmt.clear();
