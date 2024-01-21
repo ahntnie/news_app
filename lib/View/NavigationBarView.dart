@@ -5,7 +5,6 @@ import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NotificationView.dart';
-
 import '../Model/Users.dart';
 import 'ProfileView.dart';
 
@@ -31,7 +30,7 @@ class _BottomNavState extends State<BottomNav> {
     UserRepository.loadUser().then((value) {
       setState(() {
         _user = UserRepository.user!;
-        print("Lấy thành công user: ${UserRepository.user!.name}");
+        print("Lấy thành công user: ${UserRepository.user!.phone}");
       });
     }).catchError((onError) {
       print("Lấy user không thành công");

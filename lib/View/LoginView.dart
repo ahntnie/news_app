@@ -66,7 +66,6 @@ _signInWithGoogle() async {
       },
     );
   }
-
   print(userCredential.user?.displayName);
 }
 

@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/Model/Users.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,8 +15,8 @@ class StartView extends StatefulWidget {
 class _StartViewState extends State<StartView> {
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+    super.initState(); 
+    setUser();
   }
 
   Future<void> setUser() async {

@@ -7,6 +7,7 @@ import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 
+import '../Model/Users.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -15,9 +16,23 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
+Users _user = Users(
+    name: "",
+    email: "",
+    password: "",
+    birth: DateTime(2024,1,1),
+    phone: "",
+    gender: false);
+
 class _ProfileViewState extends State<ProfileView> {
+
+@override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
   bool isShowName = false;
-  bool isShowEmail = false;
   bool isShowPass = false;
   bool isShowPhoneNum = false;
   bool isShowGender = false;
@@ -34,7 +49,6 @@ class _ProfileViewState extends State<ProfileView> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   String nameError = '';
-  String emailError = '';
   String passwordError = '';
   String genderError = '';
   String phoneError = '';
@@ -44,17 +58,17 @@ class _ProfileViewState extends State<ProfileView> {
     await _googleSignIn.signOut();
     await _auth.signOut();
     UserRepository.user = null;
-    
+
     print('Đã đăng xuất');
   }
 
   void loadUser() {
-    name = _auth.currentUser!.displayName as TextEditingController;
-    phone = _auth.currentUser!.phoneNumber as TextEditingController;
-    email = _auth.currentUser!.email as TextEditingController;
+    name.text = UserRepository.user!.name;
+    email.text = UserRepository.user!.email;
+    pass.text = UserRepository.user!.password;
+    phone.text = UserRepository.user!.phone;
+    gender.text = UserRepository.user!.gender ? "Nữ" : "Nam";
   }
-
-  // Bỏ kiểm tra Email
 
   bool _isValidPhone(String phone) {
     // Biểu thức chính quy để kiểm tra định dạng số điện thoại
@@ -76,7 +90,8 @@ class _ProfileViewState extends State<ProfileView> {
                 children: [
                   Column(children: [
                     const CircleAvatar(
-                      backgroundImage: AssetImage(""),
+                      backgroundImage:
+                          AssetImage("assets/image/login_avatar.png"),
                       minRadius: 45,
                     ),
                     TextButton(
@@ -89,8 +104,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ]),
                   Column(
                     children: [
-                      const Text(
-                        "userName",
+                      Text(
+                        name.text,
                         style: TextStyle(color: Colors.black),
                       ),
                       ElevatedButton(
@@ -179,16 +194,6 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
               ListTile(
-                trailing: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isShowEmail = !isShowEmail;
-                    });
-                  },
-                  icon: isShowEmail
-                      ? const Icon(Icons.close)
-                      : const Icon(Icons.edit),
-                ),
                 leading: const Text(
                     'Email'), // Email sửa lại chỉ cho xem không cho sửa nè
               ),
@@ -206,6 +211,7 @@ class _ProfileViewState extends State<ProfileView> {
                 leading: Text('Mật khẩu'),
               ),
               TextField(
+                controller: pass,
                 decoration: InputDecoration(
                     suffixIcon: IconButton(
                       onPressed: () {

@@ -8,6 +8,7 @@ import 'package:firebase_database/firebase_database.dart';
 
 class UserRepository {
   static List<Users> lstUsers = List.filled(
+      // danh sách tài khoản người dùng
       0,
       Users(
           name: "",
@@ -17,6 +18,7 @@ class UserRepository {
           phone: "",
           gender: true),
       growable: true);
+      
   static Users? user = null;
   static Future<void> saveUser(Users? _user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,6 +52,7 @@ class UserRepository {
   }
 
   static Future<void> getUsers() async {
+    //lấy danh sách tài khoản người dùng
     var response = await FirebaseDatabase.instance.ref().child("user").get();
 
     for (DataSnapshot users in response.children) {
@@ -81,5 +84,24 @@ class UserRepository {
     }).catchError((onError) {
       print('lấy tên tài khoản không thành công $onError');
     });
+  }
+
+  static Future<void> getUserInfo(Users user) async {
+    //lấy thông tin 1 tài khoản người dùng
+    var _user = {
+      "name": user.name,
+      "email": user.email,
+      "phone": user.phone,
+      "gender": user.gender,
+      "birth": user.birth,
+      "password": user.password,
+    };
+    final ref1 = await FirebaseDatabase.instance.ref().child("user");
+    ref1.child(user.name.toString()).get();
+    ref1.child(user.email.toString()).get();
+    ref1.child(user.phone.toString()).get();
+    ref1.child(user.birth.toString()).get();
+    ref1.child(user.gender.toString()).get();
+    ref1.child(user.password.toString()).get();
   }
 }
