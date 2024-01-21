@@ -29,6 +29,12 @@ class UserRepository {
     user = Users.fromJson(jsonDecode(stringUser));
     return user;
   }
+  // static Future<Users?> loadUser() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String stringUser = prefs.getString('User') ?? "";
+  //   Users? user = Users.fromJson(jsonDecode(stringUser));
+  //   return user;
+  // }
 
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database

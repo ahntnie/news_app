@@ -63,7 +63,7 @@ class CommentRepository {
       }
     }
     for (var element in lstComments) {
-        print(element.nameUser);
-      }
+      print(element.nameUser);
+    }
   }
 }

@@ -62,14 +62,15 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         .child("comment")
         .child(cmt.title)
         .get();
+    List<String> lstLike = [];
     for (var _cmt in ref.children) {
-      List<String> lstLike = [];
       if (cmt.time == _cmt.child("time").value.toString()) {
         for (var cm in _cmt.child("lstLike").children) {
           lstLike.add(cm.value.toString());
         }
         lstLike.add(UserRepository.user!.email.toString());
-        var ref1 = await FirebaseDatabase.instance
+
+        await FirebaseDatabase.instance
             .ref()
             .child("comment")
             .child(cmt.title)
@@ -184,7 +185,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                         },
                                       );
                                     } else {
-                                      flagg = !flagg;
                                       likeComment(cmt);
                                     }
                                   },
