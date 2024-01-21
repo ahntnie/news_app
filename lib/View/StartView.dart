@@ -23,6 +23,8 @@ class _StartViewState extends State<StartView> {
     super.initState();
 
     super.initState();
+
+    setUser();
   }
 
   Future<void> setUser() async {
