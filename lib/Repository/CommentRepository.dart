@@ -62,8 +62,5 @@ class CommentRepository {
         // print("Bài viết nè ${comment.key.toString()}");
       }
     }
-    for (var element in lstComments) {
-      print(element.nameUser);
-    }
   }
 }

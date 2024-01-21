@@ -107,7 +107,6 @@ class _CategoryViewState extends State<CategoryView> {
 
   @override
   Widget build(BuildContext context) {
-    print(lstNews.length);
     if (lstNews.length < 9) {
       Load();
       return Center(

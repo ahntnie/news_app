@@ -10,13 +10,19 @@ class UserRepository {
       0,
       Users(
           name: "",
-          email: "",
+          email: null,
           password: "",
           birth: DateTime.now(),
           phone: "",
           gender: true),
       growable: true);
-  static Users? user;
+  static Users user = Users(
+      name: "",
+      email: null,
+      password: "",
+      birth: DateTime(2024),
+      phone: "",
+      gender: true);
   static Future<void> saveUser(Users? user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String stringUser = jsonEncode(user!.toJson());

@@ -29,10 +29,10 @@ class _BottomNavState extends State<BottomNav> {
     UserRepository.loadUser().then((value) {
       setState(() {
         _user = UserRepository.user!;
-        print("Lấy thành công user: ${UserRepository.user!.name}");
+        // print("Lấy thành công user: ${UserRepository.user!.name}");
       });
     }).catchError((onError) {
-      print("Lấy user không thành công");
+      // print("Lấy user không thành công");
     });
   }
 
@@ -56,7 +56,7 @@ class _BottomNavState extends State<BottomNav> {
             ),
             label: "Thông báo"),
         BottomNavigationBarItem(
-            icon: UserRepository.user!.email.isNotEmpty
+            icon: UserRepository.user!.email!.isNotEmpty
                 ? ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(50)),
                     child: Image.asset(
