@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
@@ -6,7 +7,7 @@ import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 
-import '../Model/User.dart';
+import '../Model/Users.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -15,24 +16,40 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
+Users _user = Users(
+    name: "",
+    email: "",
+    password: "",
+    birth: DateTime(2024, 1, 1),
+    phone: "",
+    gender: false);
+
 class _ProfileViewState extends State<ProfileView> {
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
   bool isShowName = false;
-  bool isShowEmail = false;
   bool isShowPass = false;
   bool isShowPhoneNum = false;
   bool isShowGender = false;
   bool isShowBirth = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController gender = TextEditingController();
   TextEditingController birth = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   String nameError = '';
-  String emailError = '';
   String passwordError = '';
+  String genderError = '';
   String phoneError = '';
   String birthError = '';
 
@@ -50,11 +67,12 @@ class _ProfileViewState extends State<ProfileView> {
     print('Đã đăng xuất');
   }
 
-  bool _isValidEmail(String email) {
-    // Biểu thức chính quy để kiểm tra định dạng email
-    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-    final regex = RegExp(pattern);
-    return regex.hasMatch(email);
+  void loadUser() {
+    name.text = UserRepository.user!.name;
+    email.text = UserRepository.user.email!;
+    pass.text = UserRepository.user!.password;
+    phone.text = UserRepository.user!.phone;
+    gender.text = UserRepository.user!.gender ? "Nữ" : "Nam";
   }
 
   bool _isValidPhone(String phone) {
@@ -77,7 +95,8 @@ class _ProfileViewState extends State<ProfileView> {
                 children: [
                   Column(children: [
                     const CircleAvatar(
-                      backgroundImage: AssetImage(""),
+                      backgroundImage:
+                          AssetImage("assets/image/login_avatar.png"),
                       minRadius: 45,
                     ),
                     TextButton(
@@ -90,8 +109,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ]),
                   Column(
                     children: [
-                      const Text(
-                        "userName",
+                      Text(
+                        name.text,
                         style: TextStyle(color: Colors.black),
                       ),
                       ElevatedButton(
@@ -180,70 +199,24 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
               ListTile(
-                trailing: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isShowEmail = !isShowEmail;
-                    });
-                  },
-                  icon: isShowEmail
-                      ? const Icon(Icons.close)
-                      : const Icon(Icons.edit),
-                ),
-                leading: const Text('Email'),
+                leading: const Text(
+                    'Email'), // Email sửa lại chỉ cho xem không cho sửa nè
               ),
-              Visibility(
-                visible: isShowEmail,
-                replacement: TextField(
-                    controller: email,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[400],
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(15)))),
-                child: Container(
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.grey[200]),
-                  child: Column(
-                    children: [
-                      const Text("Nhập Email"),
-                      TextField(
-                          controller: email,
-                          decoration: InputDecoration(
-                              errorText:
-                                  emailError.isNotEmpty ? emailError : null,
-                              filled: true,
-                              fillColor: Colors.grey[350],
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(15)))),
-                      ElevatedButton(
-                          onPressed: () async {
-                            setState(() {
-                              final accountEmail = email.text.trim();
-                              if (accountEmail.isEmpty) {
-                                emailError = 'Email không được bỏ trống';
-                              } else if (!_isValidEmail(accountEmail)) {
-                                emailError = 'Email không hợp lệ';
-                              } else {
-                                emailError = '';
-                                isShowEmail = !isShowEmail;
-                              }
-                            });
-                          },
-                          child: const Text("Lưu thay đổi"))
-                    ],
-                  ),
-                ),
-              ),
+              TextField(
+                  controller: email,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[400],
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(
+                              15)))), // BỎ HẾT ĐỂ LẠI CÁI TEXTFIELD NÀY THÔI
               const ListTile(
                 leading: Text('Mật khẩu'),
               ),
               TextField(
+                controller: pass,
                 decoration: InputDecoration(
                     suffixIcon: IconButton(
                       onPressed: () {
@@ -300,6 +273,9 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                           controller: phone,
                           decoration: InputDecoration(
+                              errorText: phoneError.isNotEmpty
+                                  ? phoneError
+                                  : null, // bổ sung cái này bữa thiếu từ đây nè
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
@@ -358,8 +334,54 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       const Text("Nhập giới tính"),
                       TextField(
+                          // Sửa chỗ giới tính này thành Dialog nè
+                          onTap: () async {
+                            await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 150,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5),
+                                        child: Column(
+                                          children: [
+                                            RadioListTile(
+                                              title: const Text("Nam"),
+                                              value: false,
+                                              groupValue: gender,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  gender.text = "Nam";
+
+                                                  Navigator.pop(context);
+                                                });
+                                              },
+                                            ),
+                                            RadioListTile(
+                                              title: const Text("Nữ"),
+                                              value: true,
+                                              groupValue: gender,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  gender.text = "Nữ";
+                                                  Navigator.pop(context);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
                           controller: gender,
+                          readOnly: true,
                           decoration: InputDecoration(
+                              errorText:
+                                  genderError.isNotEmpty ? genderError : null,
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
@@ -367,7 +389,15 @@ class _ProfileViewState extends State<ProfileView> {
                                   borderRadius: BorderRadius.circular(15)))),
                       ElevatedButton(
                           onPressed: () {
-                            setState(() {});
+                            setState(() {
+                              final accountGender = gender.text.trim();
+                              if (accountGender.isEmpty) {
+                                genderError = 'Vui lòng chọn giới tính';
+                              } else {
+                                genderError = '';
+                                isShowGender = !isShowGender;
+                              }
+                            }); // Tới đây nhaaaaaaaaaaaaaaaaaaa
                           },
                           child: const Text("Lưu thay đổi"))
                     ],
@@ -452,5 +482,11 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
         ));
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<FirebaseAuth>('_auth', _auth));
   }
 }

@@ -1,12 +1,14 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Model/User.dart';
+import '../Model/Users.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class UserRepository {
   static List<Users> lstUsers = List.filled(
+      // danh sách tài khoản người dùng
       0,
       Users(
           name: "",
@@ -25,14 +27,14 @@ class UserRepository {
       gender: true);
   static Future<void> saveUser(Users? user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String stringUser = jsonEncode(user!.toJson());
-    await prefs.setString('User', stringUser);
+    String string_user = jsonEncode(user!.toJson());
+    await prefs.setString('User', string_user);
   }
 
   static Future<Users?> loadUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String stringUser = prefs.getString('User') ?? "";
-    user = Users.fromJson(jsonDecode(stringUser));
+    String string_user = prefs.getString('User') ?? "";
+    user = Users.fromJson(jsonDecode(string_user));
     return user;
   }
   // static Future<Users?> loadUser() async {
@@ -44,7 +46,7 @@ class UserRepository {
 
   static Future<void> setUser(Users user) async {
     // Lấy dữ liệu từ API hoặc từ database
-    var user0 = {
+    var _user = {
       "name": user.name,
       "email": user.email,
       "password": user.password,
@@ -53,7 +55,7 @@ class UserRepository {
       "birth": user.birth.toString()
     };
     final ref1 = FirebaseDatabase.instance.ref().child("user");
-    ref1.child(user.name.toString()).set(user0).then((value) {
+    ref1.child(user.name.toString()).set(_user).then((value) {
       print("Thêm tài khoản thành công");
     }).catchError((onError) {
       print('Thêm tài khoản không thành công $onError');
@@ -61,6 +63,7 @@ class UserRepository {
   }
 
   static Future<void> getUsers() async {
+    //lấy danh sách tài khoản người dùng
     var response = await FirebaseDatabase.instance.ref().child("user").get();
 
     for (DataSnapshot users in response.children) {
@@ -82,7 +85,7 @@ class UserRepository {
   }
 
   static Future<void> getUser(Users user) async {
-    var user0 = {
+    var _user = {
       "name": user.name,
       "email": user.email,
     };

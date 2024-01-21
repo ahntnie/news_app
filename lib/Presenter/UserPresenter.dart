@@ -1,4 +1,4 @@
-import '../Model/User.dart';
+import '../Model/Users.dart';
 import '../Repository/UserRepository.dart';
 
 class UserPresenter {

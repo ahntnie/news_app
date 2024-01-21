@@ -1,12 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'DrawerView.dart';
 import 'HomeView.dart';
-
-import 'package:news_app/Model/User.dart';
+import 'package:news_app/Model/Users.dart';
 import 'package:news_app/Repository/UserRepository.dart';
-
 import 'LoginView.dart';
 import 'NavigationBarView.dart';
 

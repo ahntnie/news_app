@@ -347,9 +347,13 @@ class NewsRepository {
             continue;
           }
           if (channel.items[index].title
-              .toString()
-              .toLowerCase()
-              .contains(stringNews.toString().toLowerCase())) {
+                  .toString()
+                  .toLowerCase()
+                  .contains(stringNews.toString().toLowerCase()) ||
+              channel.items[index].description
+                  .toString()
+                  .toLowerCase()
+                  .contains(stringNews.toString().toLowerCase())) {
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()

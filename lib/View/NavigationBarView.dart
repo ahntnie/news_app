@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NotificationView.dart';
-
-import '../Model/User.dart';
+import '../Model/Users.dart';
 import 'ProfileView.dart';
 
 class BottomNav extends StatefulWidget {
@@ -29,7 +30,6 @@ class _BottomNavState extends State<BottomNav> {
     UserRepository.loadUser().then((value) {
       setState(() {
         _user = UserRepository.user!;
-        // print("Lấy thành công user: ${UserRepository.user!.name}");
       });
     }).catchError((onError) {
       // print("Lấy user không thành công");

@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:news_app/Model/User.dart';
+
+import 'package:news_app/Model/Users.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
+
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +21,8 @@ class _StartViewState extends State<StartView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setUser();
+
+    super.initState();
   }
 
   Future<void> setUser() async {
