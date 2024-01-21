@@ -1,20 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Model/Users.dart';
 import 'package:news_app/Presenter/CommentPresenter.dart';
+import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryNewView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/LoginView.dart';
-<<<<<<< HEAD
-import 'package:news_app/Model/Users.dart';
-=======
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
 
 class CategoryDetailView extends StatefulWidget {
   const CategoryDetailView({
@@ -48,7 +49,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   bool flag1 = true;
-  int countt = 0;
+  int count = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -59,38 +60,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
-  Future<void> likeComment(Comment cmt) async {
-    var ref = await FirebaseDatabase.instance
-        .ref()
-        .child("comment")
-        .child(cmt.title)
-        .get();
-    for (var _cmt in ref.children) {
-      List<String> lstLike = [];
-      if (cmt.time == _cmt.child("time").value.toString()) {
-        for (var cm in _cmt.child("lstLike").children) {
-          lstLike.add(cm.value.toString());
-        }
-        lstLike.add(UserRepository.user!.email.toString());
-        var ref1 = await FirebaseDatabase.instance
-            .ref()
-            .child("comment")
-            .child(cmt.title)
-            .child(_cmt.key.toString())
-            .child("lstLike")
-            .set(lstLike)
-            .then((value) {
-          print(lstLike.length);
-          print("Tăng like thành công");
-        }).catchError((onError) {
-          print('Tăng like không thành công');
-        });
-        break;
-      }
-    }
-  }
-
-  bool flagg = false;
   Container BoxComment(Comment cmt) {
     return Container(
       margin: const EdgeInsets.only(top: 5),
@@ -139,79 +108,57 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                               ],
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.only(
-                                left: MediaQuery.of(context).size.width / 10),
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    if (UserRepository.user == null) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Thông báo'),
-                                            content: const Text(
-                                                'Vui lòng đăng nhập để bình luận'),
-                                            actions: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('Đóng'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                      Navigator.of(context).push(
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const LoginView()));
-                                                    },
-                                                    child:
-                                                        const Text('Đăng nhập'),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    } else {
-                                      flagg = !flagg;
-                                      likeComment(cmt);
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    color: cmt.lstLike.isNotEmpty
-                                        ? Colors.red
-                                        : null,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.only(top: 5),
-                              child: Text(
-                                cmt.content,
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                margin: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  cmt.content,
+                                ),
                               ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  // cmt.like.toString();
+                                },
+                                icon: const Icon(Icons.thumb_up),
+                              ),
+                              // Text("${count}")
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  // _decrementCount();
+                                  // print(count);
+                                },
+                                icon: const Icon(Icons.thumb_down),
+                              ),
+                              // Text("${count}")
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          InkWell(
+                            onTap: () {},
+                            child: Text(
+                              "Trả lời",
+                              style: TextStyle(color: Colors.blue.shade400),
                             ),
                           ),
                         ],
@@ -241,12 +188,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     CommentRepository.lstComments = List.filled(
         0,
         Comment(
-          lstLike: [],
           title: "",
           nameUser: "",
           email: "",
           content: "",
           time: "",
+          like: 0,
         ),
         growable: true);
   }
@@ -261,9 +208,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         gmtt = response.headers['date'].toString();
         final fullClass = document.querySelectorAll('.fck_detail');
         // print(fullClass.length);
-        for (var element in fullClass) {
+        fullClass.forEach((element) {
           final imageElement = document.querySelectorAll('.fig-picture');
-          for (var e in imageElement) {
+          imageElement.forEach((e) {
             final img = e.outerHtml
                 .toString()
                 .substring(
@@ -273,8 +220,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 .replaceAll("amp;", '');
 
             imageUrls.add(img.trim());
-          }
-        }
+          });
+        });
 
         //print(fullClass[0].toString().split('div class="fig-picture"'));
 
@@ -284,9 +231,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
           test = contents[0].split('<figure data-size="true"');
 
-          for (var txt in test) {
+          test.forEach((txt) {
             test1 = test1 + txt.split("</picture></div>");
-          }
+          });
         });
       }
     } catch (e) {
@@ -455,10 +402,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   //print(_currentUser!.displayName.toString());
                                   if (cmt.text.isNotEmpty) {
                                     CommentRepository.setComment(Comment(
-                                      lstLike: [],
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
+                                      like: 0,
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),
@@ -467,10 +414,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       title: widget.news.title,
                                     ));
                                     addComment(Comment(
-                                      lstLike: [],
                                       content: cmt.text,
                                       email:
                                           UserRepository.user!.email.toString(),
+                                      like: 0,
                                       time: DateTime.now()
                                           .toString()
                                           .substring(0, 19),

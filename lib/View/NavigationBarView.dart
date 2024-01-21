@@ -1,13 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
+import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NotificationView.dart';
 
-import '../Model/User.dart';
+import '../Model/Users.dart';
 import 'ProfileView.dart';
 
 class BottomNav extends StatefulWidget {
@@ -87,21 +86,11 @@ class _BottomNavState extends State<BottomNav> {
             print("Thông báo");
             //Trang thông báo
             Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const NotificationView()));
+                MaterialPageRoute(builder: (context) => NotificationView()));
           }
         }
         if (indexOfItem == 2) {
           if (widget.idx != 2) {
-<<<<<<< HEAD
-            _currentUser == null
-                ? Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const LoginView()))
-                :
-
-                // Trang profile
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ProfileView()));
-=======
             if (UserRepository.user!.email.toString().isEmpty) {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const LoginView()));
@@ -109,7 +98,6 @@ class _BottomNavState extends State<BottomNav> {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const ProfileView()));
             }
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
           }
         }
       },

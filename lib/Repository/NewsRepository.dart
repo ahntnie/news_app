@@ -321,10 +321,7 @@ class NewsRepository {
     });
   }
 
-<<<<<<< HEAD
-=======
   ///Tìm kiếm
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
   static Future<void> searchNews(String stringNews) async {
     final client = http.Client();
     String img;
@@ -350,7 +347,6 @@ class NewsRepository {
             continue;
           }
           if (channel.items[index].title
-<<<<<<< HEAD
                   .toString()
                   .toLowerCase()
                   .contains(stringNews.toString().toLowerCase()) ||
@@ -358,11 +354,6 @@ class NewsRepository {
                   .toString()
                   .toLowerCase()
                   .contains(stringNews.toString().toLowerCase())) {
-=======
-              .toString()
-              .toLowerCase()
-              .contains(stringNews.toString().toLowerCase())) {
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
             img = channel.items[index].description.toString().substring(
                 channel.items[index].description
                         .toString()

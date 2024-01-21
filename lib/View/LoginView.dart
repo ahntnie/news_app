@@ -1,15 +1,14 @@
+import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-<<<<<<< HEAD
-import 'package:news_app/Model/Users.dart';
-=======
-import 'package:news_app/Model/User.dart';
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SignupView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Model/Users.dart';
 import 'DrawerView.dart';
 import 'ForgetPasswordView.dart';
 import 'NavigationBarView.dart';
@@ -32,7 +31,7 @@ _signInWithGoogle() async {
 
   UserCredential userCredential =
       await FirebaseAuth.instance.signInWithCredential(credential);
-  void showSuccessDialog(BuildContext context) {
+  void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -113,26 +112,6 @@ class _LoginViewState extends State<LoginView> {
         _accountNameError = '';
       }
     });
-  }
-
-  void validateEmail() {
-    setState(() {
-      final email = _accountNameController.text.trim();
-      if (email.isEmpty) {
-        _accountNameError = 'Email không được bỏ trống';
-      } else if (!_isValidEmail(email)) {
-        _accountNameError = 'Email không hợp lệ';
-      } else {
-        _accountNameError = '';
-      }
-    });
-  }
-
-  bool _isValidEmail(String email) {
-    // Biểu thức chính quy để kiểm tra định dạng email
-    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-    final regex = RegExp(pattern);
-    return regex.hasMatch(email);
   }
 
   void validatePassword() {
@@ -225,7 +204,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         child: TextField(
                           controller: _accountNameController,
-                          onChanged: (_) => validateEmail(),
+                          onChanged: (_) => validateAccountName(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             labelText: "Nhập email",
@@ -329,18 +308,12 @@ class _LoginViewState extends State<LoginView> {
                         onPressed: () async {
                           validateAccountName();
                           validatePassword();
-                          var us = await loginUsingEmailPassword(
+                          var user = await loginUsingEmailPassword(
                               email: _accountNameController.text,
                               password: _passwordController.text,
                               context: context);
-<<<<<<< HEAD
-                          print(us);
-                          if (us != null) {
-                            UserRepository.users = us as Users?;
-=======
                           print(user);
                           if (user != null) {
->>>>>>> 732c3da58c2c7c448c7569c4532b018576c9610f
                             print("Email là : ");
                             // ignore: use_build_context_synchronously
                             _showSuccessDialog(context);
@@ -349,6 +322,7 @@ class _LoginViewState extends State<LoginView> {
                             // ignore: use_build_context_synchronously
                             _showFailedDialog(context);
                           }
+                          ;
                         },
                         child: Text(
                           "Đăng nhập",

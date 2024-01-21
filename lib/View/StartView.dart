@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/Model/Users.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StartView extends StatefulWidget {
   const StartView({super.key});
@@ -13,13 +17,22 @@ class _StartViewState extends State<StartView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // UserPresenter.getUsers(User(
-    //     name: "Lê Hữu Thành",
-    //     email: "thanh@gmail.com",
-    //     password: "123",
-    //     birth: DateTime(2003, 5, 23),
-    //     phone: "09876556544",
-    //     gender: true));
+  }
+
+  Future<void> setUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String stringUser = prefs.getString('User') ?? "";
+    if (stringUser.isEmpty) {
+      UserRepository.saveUser(Users(
+          name: "",
+          email: "",
+          password: "",
+          birth: DateTime.now(),
+          phone: "",
+          gender: true));
+    } else {
+      UserRepository.loadUser();
+    }
   }
 
   @override
