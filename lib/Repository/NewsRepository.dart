@@ -369,7 +369,7 @@ class NewsRepository {
                   description: desc,
                   img: img,
                   urlHtml: urlHtml,
-                  category: "Tin mới nhất"));
+                  category: "Tin mới"));
             }
           }
         }
