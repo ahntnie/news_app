@@ -24,6 +24,7 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
 
   final TextEditingController _email = TextEditingController();
   String _emailError = '';
+  //hàm kiểm tra email
   void validateEmail() {
     setState(() {
       final email = _email.text.trim();
