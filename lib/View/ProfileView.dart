@@ -198,9 +198,9 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                 ),
               ),
-              ListTile(
-                leading: const Text(
-                    'Email'), // Email sửa lại chỉ cho xem không cho sửa nè
+              const ListTile(
+                leading:
+                    Text('Email'), // Email sửa lại chỉ cho xem không cho sửa nè
               ),
               TextField(
                   controller: email,
