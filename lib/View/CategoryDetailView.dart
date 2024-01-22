@@ -35,12 +35,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       ).then((value) {
         setState(() {
           lstGetCmt = CommentRepository.lstComments;
-          lstComment = lstGetCmt.map((e) => BoxComment(e)).toList();
         });
       });
     });
   }
 
+  int countt = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -51,8 +51,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
-  int like = 0;
-  Future<void> likeComment(Comment cmt) async {
+  Future<Comment> likeComment(Comment cmt) async {
     var ref = await FirebaseDatabase.instance
         .ref()
         .child("comment")
@@ -70,40 +69,36 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             cmt.lstLike = lstLike;
           });
         }
-
-        if (lstLike.contains(UserRepository.user.email.toString())) {
-          lstLike.remove(UserRepository.user.email.toString());
-          setState(() {
-            print("User unlike : ${UserRepository.user.email.toString()}");
-
-            like = lstLike.length;
-          });
-        } else {
+        if (lstLike.isEmpty ||
+            !lstLike.contains(UserRepository.user.email.toString())) {
           lstLike.add(UserRepository.user.email.toString());
-          setState(() {
-            print("User like : ${UserRepository.user.email.toString()}");
-            like = lstLike.length;
-          });
+        } else if (lstLike.contains(UserRepository.user.email.toString())) {
+          lstLike.remove(UserRepository.user.email.toString());
         }
-
-        await FirebaseDatabase.instance
+        var ref1 = await FirebaseDatabase.instance
             .ref()
             .child("comment")
             .child(cmt.title)
             .child(_cmt.key.toString())
             .child("lstLike")
             .set(lstLike)
-            .then((value) {})
-            .catchError((onError) {
+            .then((value) {
+          cmt.lstLike = lstLike;
+
+          getComment();
+          print("Tăng like thành công");
+        }).catchError((onError) {
           print('Tăng like không thành công');
         });
         break;
       }
     }
+    return cmt;
   }
 
   bool flagg = false;
   Container BoxComment(Comment cmt) {
+    //print("${cmt.lstLike.length}  ${cmt.content}");
     return Container(
       margin: const EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
@@ -154,66 +149,72 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                           Container(
                             padding: EdgeInsets.only(
                                 left: MediaQuery.of(context).size.width / 10),
-                            child: Row(
+                            child: Column(
                               children: [
                                 IconButton(
-                                  onPressed: () {
-                                    if (UserRepository.user.email!.isEmpty) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Thông báo'),
-                                            content: const Text(
-                                                'Vui lòng đăng nhập để tương tác'),
-                                            actions: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('Đóng'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                      Navigator.of(context).push(
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const LoginView()));
-                                                    },
-                                                    child:
-                                                        const Text('Đăng nhập'),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    } else {
-                                      likeComment(cmt);
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    color: cmt.lstLike.contains(UserRepository
-                                            .user.email
-                                            .toString())
-                                        ? Colors.red
-                                        : null,
-                                  ),
-                                ),
-                                Text(like != 0
-                                    ? cmt.lstLike.length.toString()
-                                    : "")
+                                    onPressed: () async {
+                                      var ref = await FirebaseDatabase.instance
+                                          .ref()
+                                          .child("comment")
+                                          .child(cmt.title)
+                                          .get();
+                                      List<String> lstLike = [];
+
+                                      if (UserRepository.user.email!.isEmpty) {
+                                        // ignore: use_build_context_synchronously
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: const Text('Thông báo'),
+                                              content: const Text(
+                                                  'Vui lòng đăng nhập để bình luận'),
+                                              actions: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: const Text('Đóng'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        const LoginView()));
+                                                      },
+                                                      child: const Text(
+                                                          'Đăng nhập'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        cmt = await likeComment(cmt);
+                                      }
+                                    },
+                                    icon: Icon(
+                                      Icons.favorite,
+                                      color: cmt.lstLike.contains(UserRepository
+                                              .user.email
+                                              .toString())
+                                          ? Colors.red
+                                          : null,
+                                    )),
+                                Text(cmt.lstLike.length.toString())
                               ],
                             ),
                           ),

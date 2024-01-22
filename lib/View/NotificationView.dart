@@ -1,7 +1,10 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Presenter/CommentPresenter.dart';
+import 'package:news_app/Repository/CommentRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/DrawerView.dart';
@@ -14,7 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class NotificationView extends StatefulWidget {
-  const NotificationView({super.key});
+  const NotificationView({
+    super.key,
+  });
 
   @override
   State<NotificationView> createState() => _NotificationViewState();
@@ -44,15 +49,6 @@ class _NotificationViewState extends State<NotificationView> {
     await prefs.setStringList('viewedNotiCmt', viewedCmtJsonList);
   }
 
-  Future<List<Comment>> loadNotiCmt() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> viewedCmtJsonList = prefs.getStringList('viewedNotiCmt') ?? [];
-    List<Comment> viewedNotiCmt = viewedCmtJsonList
-        .map((json) => Comment.fromJson(jsonDecode(json)))
-        .toList();
-    return viewedNotiCmt;
-  }
-
   final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
 
   List<News> viewedNews = [];
@@ -63,11 +59,6 @@ class _NotificationViewState extends State<NotificationView> {
     loadViewedNews().then((newsList) {
       setState(() {
         viewedNews = newsList;
-      });
-    });
-    loadNotiCmt().then((newsComments) {
-      setState(() {
-        viewedNotiCmt = newsComments;
       });
     });
   }
@@ -90,6 +81,7 @@ class _NotificationViewState extends State<NotificationView> {
 
   @override
   Widget build(BuildContext context) {
+    getComment();
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -259,16 +251,56 @@ class _NotificationViewState extends State<NotificationView> {
   }
 
   Widget _TabComment() {
+    if (lstGetCmt.isEmpty) {
+      return Center(
+        child: Text("Không có bình luận"),
+      );
+    }
     return SingleChildScrollView(
       child: Column(
-        children: [BoxComment()],
+        children: [
+          Column(children: lstGetCmt.map((e) => BoxComment(e)).toList())
+        ],
       ),
     );
 
     //}
   }
 
-  Container BoxComment() {
+  List<Comment> lstGetCmt = [];
+  Future<void> getComment() async {
+    setState(() {
+      setState(() {
+        lstGetCmt = CommentRepository.lstComments;
+      });
+    });
+  }
+
+  Future<void> checklikeComment(Comment cmt) async {
+    var ref = await FirebaseDatabase.instance
+        .ref()
+        .child("comment")
+        .child(cmt.title)
+        .get();
+    List<String> lstLike = [];
+    for (var _cmt in ref.children) {
+      if (cmt.time == _cmt.child("time").value.toString()) {
+        for (var count = 0;
+            count < _cmt.child("lstLike").children.length;
+            count++) {
+          lstLike.add(
+              _cmt.child("lstLike").child(count.toString()).value.toString());
+          setState(() {
+            cmt.lstLike = lstLike;
+          });
+        }
+      }
+    }
+  }
+
+  // late Comment cmt;
+  Container BoxComment(Comment cmt) {
+    checklikeComment(cmt);
     return Container(
       margin: const EdgeInsets.all(8.0),
       // padding: const EdgeInsets.all(8.0),
@@ -311,7 +343,7 @@ class _NotificationViewState extends State<NotificationView> {
                             padding:
                                 const EdgeInsets.only(left: 10, bottom: 30),
                             child: Text(
-                              "Bach Anh Tien đã thích bình luận của bạnbạnbạnbạn",
+                              "${cmt.nameUser.toString()} đã thích bình luận của bạn",
                             ),
                           ),
                         ),
@@ -320,7 +352,7 @@ class _NotificationViewState extends State<NotificationView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text("hello"),
+                        Text(cmt.time.toString()),
                       ],
                     )
                   ],
@@ -333,8 +365,8 @@ class _NotificationViewState extends State<NotificationView> {
     );
   }
 
-  List<Widget> lstComment = [];
-  List<Comment> lstGetCmt = [];
+  List<Widget> lstComments = [];
+  List<Comment> lstGetCmts = [];
 
   Widget _TabStoryAgain() {
     void desc = "";
