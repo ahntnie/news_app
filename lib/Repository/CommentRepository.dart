@@ -47,8 +47,11 @@ class CommentRepository {
     for (DataSnapshot comment in response.children) {
       if (comment.key.toString() == title) {
         for (DataSnapshot cmt in response.child(title).children) {
-          for (var like in response.child(title).child("lstLike").children) {
-            lst.add(like.value.toString());
+          for (var count = 0;
+              count < cmt.child("lstLike").children.length;
+              count++) {
+            lst.add(
+                cmt.child("lstLike").child(count.toString()).value.toString());
           }
           lstComments.add(Comment(
             lstLike: lst,

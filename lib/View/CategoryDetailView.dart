@@ -39,6 +39,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         setState(() {
           lstGetCmt = CommentRepository.lstComments;
           lstComment = lstGetCmt.map((e) => BoxComment(e)).toList();
+          // print(lstGetCmt[0].lstLike[0]);
+          // print(lstGetCmt[0].lstLike[1]);
         });
       });
     });
@@ -54,7 +56,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
-  bool isLike = false;
   int like = 0;
   Future<void> likeComment(Comment cmt) async {
     var ref = await FirebaseDatabase.instance
@@ -70,21 +71,24 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             count++) {
           lstLike.add(
               _cmt.child("lstLike").child(count.toString()).value.toString());
+          setState(() {
+            cmt.lstLike = lstLike;
+          });
         }
+
         if (lstLike.contains(UserRepository.user.email.toString())) {
           lstLike.remove(UserRepository.user.email.toString());
+          setState(() {
+            print("User unlike : ${UserRepository.user.email.toString()}");
 
-          if (cmt.time == _cmt.child("time").value.toString()) {
-            isLike = false;
             like = lstLike.length;
-          }
+          });
         } else {
           lstLike.add(UserRepository.user.email.toString());
-
-          if (cmt.time == _cmt.child("time").value.toString()) {
-            isLike = true;
+          setState(() {
+            print("User like : ${UserRepository.user.email.toString()}");
             like = lstLike.length;
-          }
+          });
         }
 
         await FirebaseDatabase.instance
@@ -166,7 +170,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                           return AlertDialog(
                                             title: const Text('Thông báo'),
                                             content: const Text(
-                                                'Vui lòng đăng nhập để bình luận'),
+                                                'Vui lòng đăng nhập để tương tác'),
                                             actions: [
                                               Row(
                                                 mainAxisAlignment:
@@ -205,10 +209,16 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   },
                                   icon: Icon(
                                     Icons.favorite,
-                                    color: isLike ? Colors.red : null,
+                                    color: cmt.lstLike.contains(UserRepository
+                                            .user.email
+                                            .toString())
+                                        ? Colors.red
+                                        : null,
                                   ),
                                 ),
-                                Text(like != 0 ? "${like}" : "")
+                                Text(like != 0
+                                    ? cmt.lstLike.length.toString()
+                                    : "")
                               ],
                             ),
                           ),
@@ -248,7 +258,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   void initState() {
     super.initState();
     fetchData();
-
+    // getComment();
     CommentRepository.lstComments = List.filled(
         0,
         Comment(
@@ -489,7 +499,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         if (cmt.text.isNotEmpty) {
                           CommentRepository.setComment(Comment(
                             lstLike: [],
-                            content: cmt.text,
+                            content: cmt.text.trim(),
                             email: UserRepository.user.email.toString(),
                             time: DateTime.now().toString().substring(0, 19),
                             nameUser: UserRepository.user.name.toString(),

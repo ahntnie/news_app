@@ -3,9 +3,9 @@ class Comment {
   String email;
   String content;
   String time;
-
   String title;
   List lstLike;
+
   Comment({
     required this.content,
     required this.email,
