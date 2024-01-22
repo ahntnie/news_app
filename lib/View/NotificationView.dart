@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -35,16 +37,37 @@ class _NotificationViewState extends State<NotificationView> {
     return viewedNews;
   }
 
+  Future<void> saveNotiCmt(List<Comment> viewedNews) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedCmtJsonList =
+        viewedNotiCmt.map((comments) => jsonEncode(comments.toJson())).toList();
+    await prefs.setStringList('viewedNotiCmt', viewedCmtJsonList);
+  }
+
+  Future<List<Comment>> loadNotiCmt() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedCmtJsonList = prefs.getStringList('viewedNotiCmt') ?? [];
+    List<Comment> viewedNotiCmt = viewedCmtJsonList
+        .map((json) => Comment.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedNotiCmt;
+  }
+
   final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
 
   List<News> viewedNews = [];
-
+  List<Comment> viewedNotiCmt = [];
   @override
   void initState() {
     super.initState();
     loadViewedNews().then((newsList) {
       setState(() {
         viewedNews = newsList;
+      });
+    });
+    loadNotiCmt().then((newsComments) {
+      setState(() {
+        viewedNotiCmt = newsComments;
       });
     });
   }
@@ -236,8 +259,77 @@ class _NotificationViewState extends State<NotificationView> {
   }
 
   Widget _TabComment() {
-    return const Center(
-      child: Text('Không có bình luận'),
+    return SingleChildScrollView(
+      child: Column(
+        children: [BoxComment()],
+      ),
+    );
+
+    //}
+  }
+
+  Container BoxComment() {
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      // padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: Colors.grey.shade300,
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      width: MediaQuery.of(context).size.width / 0.1,
+      height: MediaQuery.of(context).size.height / 7,
+      constraints: const BoxConstraints(
+        minHeight: 100.0,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              width: MediaQuery.of(context).size.width / 2,
+              //height: MediaQuery.of(context).size.height / 8,
+              decoration: const BoxDecoration(),
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
+                          child: Image.asset(
+                            "assets/image/avt.png",
+                            fit: BoxFit.cover,
+                            height: 80,
+                            width: 80,
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding:
+                                const EdgeInsets.only(left: 10, bottom: 30),
+                            child: Text(
+                              "Bach Anh Tien đã thích bình luận của bạnbạnbạnbạn",
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text("hello"),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

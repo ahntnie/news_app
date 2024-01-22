@@ -29,18 +29,13 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
   List<Comment> lstGetCmt = [];
   Future<void> getComment() async {
-    //lstComment
-    //print("Vào get nè");
     setState(() {
-      //print(widget.news.title.toString());
       CommentPresenter.getComment(
         widget.news.title.toString(),
       ).then((value) {
         setState(() {
           lstGetCmt = CommentRepository.lstComments;
           lstComment = lstGetCmt.map((e) => BoxComment(e)).toList();
-          // print(lstGetCmt[0].lstLike[0]);
-          // print(lstGetCmt[0].lstLike[1]);
         });
       });
     });
@@ -137,7 +132,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(50)),
                             child: Image.asset(
-                              "assets/image/vien.jpg",
+                              "assets/image/avt.png",
                               fit: BoxFit.cover,
                               height: 40,
                               width: 40,
