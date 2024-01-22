@@ -8,7 +8,7 @@ import 'LoginView.dart';
 import 'NavigationBarView.dart';
 
 class SignupView extends StatefulWidget {
-  const SignupView({Key? key}) : super(key: key);
+  const SignupView({super.key});
 
   @override
   _SignupViewState createState() => _SignupViewState();

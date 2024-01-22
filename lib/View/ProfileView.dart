@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +29,7 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     loadUser();
+    // loadUserGoogle();
   }
 
   bool isShowName = false;
@@ -62,6 +62,7 @@ class _ProfileViewState extends State<ProfileView> {
       phone: "",
       gender: false);
 
+
   Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
@@ -75,6 +76,7 @@ class _ProfileViewState extends State<ProfileView> {
     UserRepository.saveUser(UserRepository.user);
     print('Đã đăng xuất');
   }
+
 
   void loadUser() {
     _user = UserRepository.user!;

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/Users.dart';
@@ -86,11 +87,20 @@ class UserRepository {
     });
   }
 
-  static Future<void> updateUserInfo(String username,String phone,String birth)async {
+  static Future<void> updateUserInfo(
+      String username, String phone, String birth) async {
     DatabaseReference ref1 =
-        FirebaseDatabase.instance.ref().child("user/$username");
-    await ref1.update(
-        {"phone": phone,"birth":birth});
+        FirebaseDatabase.instance.ref().child("user/$username/");
+    await ref1.update({"phone": phone, "birth": birth});
+  }
 
+  static Future<void> updateGoogleUserInfo(String phone, String name) async {
+    var Gguser = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        print(user.displayName);
+        user.updatePhoneNumber(phone as PhoneAuthCredential);
+        user.updateDisplayName(name);
+      }
+    });
   }
 }
