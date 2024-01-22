@@ -30,7 +30,7 @@ class _BottomNavState extends State<BottomNav> {
     UserRepository.loadUser().then((value) {
       setState(() {
         _user = UserRepository.user!;
-        print("Lấy thành công user: ${UserRepository.user!.phone}");
+        print("Lấy thành công user: ${UserRepository.user!.name}");
       });
     }).catchError((onError) {
       print("Lấy user không thành công");

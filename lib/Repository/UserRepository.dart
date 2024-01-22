@@ -18,8 +18,9 @@ class UserRepository {
           phone: "",
           gender: true),
       growable: true);
-      
+
   static Users? user = null;
+
   static Future<void> saveUser(Users? _user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String string_user = jsonEncode(_user!.toJson());
@@ -86,22 +87,11 @@ class UserRepository {
     });
   }
 
-  static Future<void> getUserInfo(Users user) async {
-    //lấy thông tin 1 tài khoản người dùng
-    var _user = {
-      "name": user.name,
-      "email": user.email,
-      "phone": user.phone,
-      "gender": user.gender,
-      "birth": user.birth,
-      "password": user.password,
-    };
-    final ref1 = await FirebaseDatabase.instance.ref().child("user");
-    ref1.child(user.name.toString()).get();
-    ref1.child(user.email.toString()).get();
-    ref1.child(user.phone.toString()).get();
-    ref1.child(user.birth.toString()).get();
-    ref1.child(user.gender.toString()).get();
-    ref1.child(user.password.toString()).get();
+  static Future<void> updateUserInfo(String username,String phone,String birth)async {
+    DatabaseReference ref1 =
+        FirebaseDatabase.instance.ref().child("user/${username}");
+    await ref1.update(
+        {"phone": phone,"birth":birth});
+
   }
 }

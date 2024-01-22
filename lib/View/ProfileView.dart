@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,17 +18,8 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
-Users _user = Users(
-    name: "",
-    email: "",
-    password: "",
-    birth: DateTime(2024,1,1),
-    phone: "",
-    gender: false);
-
 class _ProfileViewState extends State<ProfileView> {
-
-@override
+  @override
   void initState() {
     super.initState();
     loadUser();
@@ -54,6 +47,14 @@ class _ProfileViewState extends State<ProfileView> {
   String phoneError = '';
   String birthError = '';
 
+  Users _user = Users(
+      name: "",
+      email: "",
+      password: "",
+      birth: DateTime(2024, 1, 1),
+      phone: "",
+      gender: false);
+
   Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
@@ -63,11 +64,18 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   void loadUser() {
-    name.text = UserRepository.user!.name;
-    email.text = UserRepository.user!.email;
-    pass.text = UserRepository.user!.password;
-    phone.text = UserRepository.user!.phone;
-    gender.text = UserRepository.user!.gender ? "Nữ" : "Nam";
+    _user = UserRepository.user!;
+    name.text = _user.name;
+    email.text = _user.email;
+    pass.text = _user.password;
+    birth.text = DateFormat('dd/MM/yyyy').format(_user.birth);
+    phone.text = _user.phone;
+    gender.text = _user.gender ? "Nữ" : "Nam";
+  }
+
+  void updateUser() {
+    UserRepository.updateUserInfo(
+        name.text, phone.text, birth.text,);
   }
 
   bool _isValidPhone(String phone) {
@@ -184,6 +192,7 @@ class _ProfileViewState extends State<ProfileView> {
                             } else {
                               nameError = '';
                               isShowName = !isShowName;
+                              updateUser();
                             }
                           });
                         },
@@ -205,8 +214,7 @@ class _ProfileViewState extends State<ProfileView> {
                       fillColor: Colors.grey[400],
                       border: OutlineInputBorder(
                           borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(
-                              15)))), // BỎ HẾT ĐỂ LẠI CÁI TEXTFIELD NÀY THÔI
+                          borderRadius: BorderRadius.circular(15)))),
               const ListTile(
                 leading: Text('Mật khẩu'),
               ),
@@ -268,9 +276,8 @@ class _ProfileViewState extends State<ProfileView> {
                       TextField(
                           controller: phone,
                           decoration: InputDecoration(
-                              errorText: phoneError.isNotEmpty
-                                  ? phoneError
-                                  : null, // bổ sung cái này bữa thiếu từ đây nè
+                              errorText:
+                                  phoneError.isNotEmpty ? phoneError : null,
                               filled: true,
                               fillColor: Colors.grey[350],
                               border: OutlineInputBorder(
@@ -286,6 +293,7 @@ class _ProfileViewState extends State<ProfileView> {
                               phoneError = 'Số điện thoại không hợp lệ';
                             } else {
                               phoneError = '';
+                              updateUser();
                               isShowPhoneNum = !isShowPhoneNum;
                             }
                           });
@@ -349,18 +357,19 @@ class _ProfileViewState extends State<ProfileView> {
                                               onChanged: (value) {
                                                 setState(() {
                                                   gender.text = "Nam";
-
+                                                  
                                                   Navigator.pop(context);
                                                 });
                                               },
                                             ),
                                             RadioListTile(
                                               title: const Text("Nữ"),
-                                              value: true,
+                                              value: bool,
                                               groupValue: gender,
                                               onChanged: (value) {
                                                 setState(() {
                                                   gender.text = "Nữ";
+                                                  value = true;
                                                   Navigator.pop(context);
                                                 });
                                               },
@@ -390,6 +399,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 genderError = 'Vui lòng chọn giới tính';
                               } else {
                                 genderError = '';
+                                updateUser();
                                 isShowGender = !isShowGender;
                               }
                             }); // Tới đây nhaaaaaaaaaaaaaaaaaaa
@@ -465,6 +475,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 birthError = 'Vui lòng chọn ngày sinh';
                               } else {
                                 birthError = '';
+                                updateUser();
                                 isShowBirth = !isShowBirth;
                               }
                             });
