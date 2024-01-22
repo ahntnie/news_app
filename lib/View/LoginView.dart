@@ -20,6 +20,7 @@ class LoginView extends StatefulWidget {
   State<LoginView> createState() => _LoginViewState();
 }
 
+//hàm đăng nhập bằng Google
 _signInWithGoogle() async {
   GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
   GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -35,6 +36,7 @@ _signInWithGoogle() async {
   print(userCredential.user?.displayName);
 }
 
+//hàm đăng nhập bằng username và password của firebase
 Future<User?> loginUsingEmailPassword(
     {required String email,
     required String password,
@@ -66,6 +68,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _passwordController = TextEditingController();
   String _accountNameError = '';
   String _accountPasswordError = '';
+  //hàm kiểm tra tài khoản
   void validateAccountName() {
     setState(() {
       final accountName = _accountNameController.text.trim();
@@ -79,6 +82,7 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
+  //hàm kiểm tra email
   void validateEmail() {
     setState(() {
       final email = _accountNameController.text.trim();
@@ -99,6 +103,7 @@ class _LoginViewState extends State<LoginView> {
     return regex.hasMatch(email);
   }
 
+  //hàm kiểm tra password
   void validatePassword() {
     setState(() {
       final accountPassword = _passwordController.text.trim();
@@ -381,6 +386,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+//hàm show thông báo đăng nhập thành công
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -424,6 +430,7 @@ class _LoginViewState extends State<LoginView> {
     final screenSize = MediaQuery.of(context).size.height;
     return baseSize * (screenSize / baseScreenSize);
   }
+//hàm show thông báo đăng nhập thất bại
 
   void _showFailedDialog(BuildContext context) {
     showDialog(

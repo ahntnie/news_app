@@ -14,6 +14,7 @@ import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/CategoryView.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:rss_dart/domain/rss1_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -374,11 +375,15 @@ class _HomeViewState extends State<HomeView> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: InkWell(
         onTap: () {
-          setState(() {
-            viewedNews.add(news);
-            saveViewedNews(viewedNews);
-            print("đã lưu");
-          });
+          if (!viewedNews.contains(news)) {
+            setState(() {
+              viewedNews.add(news);
+              saveViewedNews(viewedNews);
+              print("Đã lưu");
+            });
+          } else {
+            print("Trùng");
+          }
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => CategoryDetailView(news: news)));
         },
@@ -486,9 +491,13 @@ Widget buildImage(
         String assetImage, int index, News news, BuildContext context) =>
     InkWell(
       onTap: () {
-        viewedNews.add(news);
-        saveViewedNews(viewedNews);
-        print("đã lưu");
+        if (!viewedNews.contains(news)) {
+          viewedNews.add(news);
+          saveViewedNews(viewedNews);
+          print("Đã lưu");
+        } else {
+          print("Trùng");
+        }
         Navigator.popUntil(context, (route) => route.isFirst);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => CategoryDetailView(

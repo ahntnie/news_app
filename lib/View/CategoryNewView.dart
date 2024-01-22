@@ -263,9 +263,13 @@ class _CategoryNewViewState extends State<CategoryNewView> {
 ListTile newsCard(BuildContext context, News news) {
   return ListTile(
     onTap: () {
-      viewedNews.add(news);
-      saveViewedNews(viewedNews);
-      print("đã lưu");
+      if (!viewedNews.contains(news)) {
+        viewedNews.add(news);
+        saveViewedNews(viewedNews);
+        print("Đã lưu");
+      } else {
+        print("Trùng");
+      }
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => CategoryDetailView(news: news)));
     },
