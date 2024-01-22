@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Users {
-  late final String name;
+  final String name;
   final String email;
-  late final String phone;
+  final String phone;
   final DateTime birth;
   final String password;
   final bool gender;

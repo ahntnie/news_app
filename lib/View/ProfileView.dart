@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +16,14 @@ class ProfileView extends StatefulWidget {
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
+
+Users _user = Users(
+    name: "",
+    email: "",
+    password: "",
+    birth: DateTime(2024, 1, 1),
+    phone: "",
+    gender: false);
 
 class _ProfileViewState extends State<ProfileView> {
   @override
@@ -58,8 +65,14 @@ class _ProfileViewState extends State<ProfileView> {
   Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
-    UserRepository.user = null;
-
+    UserRepository.user = Users(
+        name: "",
+        email: "",
+        password: "",
+        birth: DateTime.now(),
+        phone: "",
+        gender: true);
+    UserRepository.saveUser(UserRepository.user);
     print('Đã đăng xuất');
   }
 
@@ -75,7 +88,10 @@ class _ProfileViewState extends State<ProfileView> {
 
   void updateUser() {
     UserRepository.updateUserInfo(
-        name.text, phone.text, birth.text,);
+      name.text,
+      phone.text,
+      birth.text,
+    );
   }
 
   bool _isValidPhone(String phone) {
@@ -88,6 +104,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    loadUser();
     return Scaffold(
         bottomNavigationBar: const BottomNav(idx: 2),
         body: SingleChildScrollView(
@@ -114,7 +131,7 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       Text(
                         name.text,
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -202,9 +219,9 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                 ),
               ),
-              ListTile(
-                leading: const Text(
-                    'Email'), // Email sửa lại chỉ cho xem không cho sửa nè
+              const ListTile(
+                leading:
+                    Text('Email'), // Email sửa lại chỉ cho xem không cho sửa nè
               ),
               TextField(
                   controller: email,
@@ -357,7 +374,7 @@ class _ProfileViewState extends State<ProfileView> {
                                               onChanged: (value) {
                                                 setState(() {
                                                   gender.text = "Nam";
-                                                  
+
                                                   Navigator.pop(context);
                                                 });
                                               },

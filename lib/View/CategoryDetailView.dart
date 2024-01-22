@@ -44,8 +44,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
-  bool flag1 = true;
-  int countt = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -56,39 +54,48 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
+  bool isLike = false;
+  int like = 0;
   Future<void> likeComment(Comment cmt) async {
     var ref = await FirebaseDatabase.instance
         .ref()
         .child("comment")
         .child(cmt.title)
         .get();
+    List<String> lstLike = [];
     for (var _cmt in ref.children) {
-      List<String> lstLike = [];
       if (cmt.time == _cmt.child("time").value.toString()) {
-        print("số like: ${_cmt.child("lstLike").children.length}");
         for (var count = 0;
             count < _cmt.child("lstLike").children.length;
             count++) {
           lstLike.add(
               _cmt.child("lstLike").child(count.toString()).value.toString());
         }
-        if (lstLike.contains(UserRepository.user!.email.toString())) {
-          lstLike.remove(UserRepository.user!.email.toString());
+        if (lstLike.contains(UserRepository.user?.email.toString())) {
+          lstLike.remove(UserRepository.user?.email.toString());
+
+          if (cmt.time == _cmt.child("time").value.toString()) {
+            isLike = false;
+            like = lstLike.length;
+          }
         } else {
           lstLike.add(UserRepository.user!.email.toString());
+
+          if (cmt.time == _cmt.child("time").value.toString()) {
+            isLike = true;
+            like = lstLike.length;
+          }
         }
-        print("Lstlike: ${lstLike.length}");
-        var ref1 = await FirebaseDatabase.instance
+
+        await FirebaseDatabase.instance
             .ref()
             .child("comment")
             .child(cmt.title)
             .child(_cmt.key.toString())
             .child("lstLike")
             .set(lstLike)
-            .then((value) {
-          print(lstLike.length);
-          print("Tăng like thành công");
-        }).catchError((onError) {
+            .then((value) {})
+            .catchError((onError) {
           print('Tăng like không thành công');
         });
         break;
@@ -152,8 +159,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                    print(
-                                        "a${UserRepository.user!.email.toString()}a");
                                     if (UserRepository.user!.email.isEmpty) {
                                       showDialog(
                                         context: context,
@@ -195,17 +200,15 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                         },
                                       );
                                     } else {
-                                      flagg = !flagg;
                                       likeComment(cmt);
                                     }
                                   },
                                   icon: Icon(
                                     Icons.favorite,
-                                    color: cmt.lstLike.isNotEmpty
-                                        ? Colors.red
-                                        : null,
+                                    color: isLike ? Colors.red : null,
                                   ),
                                 ),
+                                Text(like != 0 ? "$like" : "")
                               ],
                             ),
                           ),
@@ -269,6 +272,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         gmtt = response.headers['date'].toString();
         final fullClass = document.querySelectorAll('.fck_detail');
         // print(fullClass.length);
+        // ignore: unused_local_variable
         for (var element in fullClass) {
           final imageElement = document.querySelectorAll('.fig-picture');
           for (var e in imageElement) {
@@ -330,200 +334,200 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              CategoryView(name: widget.news.category)));
-                    },
-                    child: Text(
-                      widget.news.category,
-                      style: const TextStyle(
-                          color: Color.fromARGB(255, 250, 19, 2), fontSize: 23),
-                    ),
-                  ),
-                  const Text("/", style: TextStyle(fontSize: 23)),
-                  InkWell(
-                    onTap: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => CategoryNewView(
-                                news: widget.news,
-                              )));
-                    },
-                    child: const Text(
-                      " Tin mới nhất",
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 207, 91, 80),
-                          fontSize: 23),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(gmtt),
-                ],
-              ),
-              Text(
-                widget.news.title,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Column(
-                children: test1.map((e) {
-                  int index = test1.length > count ? count++ : test1.length - 1;
-                  return index.isEven
-                      ? Html(data: test1[index])
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.network(imageUrls[
-                              imageUrls.length > count1
-                                  ? count1++
-                                  : imageUrls.length - 1]),
-                        );
-                }).toList(),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Row(
-                children: [
-                  Text(
-                    "Bình luận",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 27),
-                  ),
-                ],
-              ),
-              Container(
-                // margin: const EdgeInsets.only(top: 30),
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: TextFormField(
-                    maxLines: null,
-                    controller: cmt,
-                    decoration: InputDecoration(
-                        border: const OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        hintText: 'Bình luận của bạn...',
-                        suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (UserRepository.user!.email.isEmpty) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Thông báo'),
-                                        content: const Text(
-                                            'Vui lòng đăng nhập để bình luận'),
-                                        actions: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                  Navigator.of(context).pop();
-                                                  cmt.clear();
-                                                },
-                                                child: const Text('Đóng'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                  // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const LoginView()));
-                                                },
-                                                child: const Text('Đăng nhập'),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  //print(_currentUser!.displayName.toString());
-                                  if (cmt.text.isNotEmpty) {
-                                    CommentRepository.setComment(Comment(
-                                      lstLike: [],
-                                      content: cmt.text,
-                                      email:
-                                          UserRepository.user!.email.toString(),
-                                      time: DateTime.now()
-                                          .toString()
-                                          .substring(0, 19),
-                                      nameUser:
-                                          UserRepository.user!.name.toString(),
-                                      title: widget.news.title,
-                                    ));
-                                    addComment(Comment(
-                                      lstLike: [],
-                                      content: cmt.text,
-                                      email:
-                                          UserRepository.user!.email.toString(),
-                                      time: DateTime.now()
-                                          .toString()
-                                          .substring(0, 19),
-                                      nameUser:
-                                          UserRepository.user!.name.toString(),
-                                      title: widget.news.title,
-                                    ));
-                                    cmt.clear();
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Thông báo'),
-                                          content: const Text(
-                                              'Vui lòng nhập bình luận'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Đóng hộp thoại khi người dùng nhấn nút
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('Đóng'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.send)))),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Column(children: lstGetCmt.map((e) => BoxComment(e)).toList()),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          ),
-        ),
+      body: DetailView(context, count, count1),
+    );
+  }
+
+  SingleChildScrollView DetailView(
+      BuildContext context, int count, int count1) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: widgetTitleContentImage(context, count, count1),
       ),
+    );
+  }
+
+  Column widgetTitleContentImage(BuildContext context, int count, int count1) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            InkWell(
+              onTap: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        CategoryView(name: widget.news.category)));
+              },
+              child: Text(
+                widget.news.category,
+                style: const TextStyle(
+                    color: Color.fromARGB(255, 250, 19, 2), fontSize: 23),
+              ),
+            ),
+            const Text("/", style: TextStyle(fontSize: 23)),
+            InkWell(
+              onTap: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CategoryNewView(
+                          news: widget.news,
+                        )));
+              },
+              child: const Text(
+                " Tin mới nhất",
+                style: TextStyle(
+                    color: Color.fromARGB(255, 207, 91, 80), fontSize: 23),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(gmtt),
+          ],
+        ),
+        Text(
+          widget.news.title,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Column(
+          children: test1.map((e) {
+            int index = test1.length > count ? count++ : test1.length - 1;
+            return index.isEven
+                ? Html(data: test1[index])
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Image.network(imageUrls[imageUrls.length > count1
+                        ? count1++
+                        : imageUrls.length - 1]),
+                  );
+          }).toList(),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        const Row(
+          children: [
+            Text(
+              "Bình luận",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 27),
+            ),
+          ],
+        ),
+        wigetComment(context),
+        const SizedBox(
+          height: 15,
+        ),
+        Column(children: lstGetCmt.map((e) => BoxComment(e)).toList()),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    );
+  }
+
+  Container wigetComment(BuildContext context) {
+    return Container(
+      // margin: const EdgeInsets.only(top: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: TextFormField(
+          maxLines: null,
+          controller: cmt,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              hintText: 'Bình luận của bạn...',
+              suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      if (UserRepository.user!.email.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Thông báo'),
+                              content:
+                                  const Text('Vui lòng đăng nhập để bình luận'),
+                              actions: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                        Navigator.of(context).pop();
+                                        cmt.clear();
+                                      },
+                                      child: const Text('Đóng'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const LoginView()));
+                                      },
+                                      child: const Text('Đăng nhập'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        //print(_currentUser!.displayName.toString());
+                        if (cmt.text.isNotEmpty) {
+                          CommentRepository.setComment(Comment(
+                            lstLike: [],
+                            content: cmt.text,
+                            email: UserRepository.user!.email.toString(),
+                            time: DateTime.now().toString().substring(0, 19),
+                            nameUser: UserRepository.user!.name.toString(),
+                            title: widget.news.title,
+                          ));
+                          addComment(Comment(
+                            lstLike: [],
+                            content: cmt.text,
+                            email: UserRepository.user!.email.toString(),
+                            time: DateTime.now().toString().substring(0, 19),
+                            nameUser: UserRepository.user!.name.toString(),
+                            title: widget.news.title,
+                          ));
+                          cmt.clear();
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Thông báo'),
+                                content: const Text('Vui lòng nhập bình luận'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      // Đóng hộp thoại khi người dùng nhấn nút
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Đóng'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.send)))),
     );
   }
 }

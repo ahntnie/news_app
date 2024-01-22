@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:news_app/Model/Users.dart';
-import 'package:news_app/Presenter/UserPresenter.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Model/Users.dart';
 
 class StartView extends StatefulWidget {
   const StartView({super.key});
@@ -15,25 +17,26 @@ class StartView extends StatefulWidget {
 class _StartViewState extends State<StartView> {
   @override
   void initState() {
-    super.initState(); 
-    setUser();
+    // TODO: implement initState
+    super.initState();
+    // setUser();
   }
 
-  Future<void> setUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String stringUser = prefs.getString('User') ?? "";
-    if (stringUser.isEmpty) {
-      UserRepository.saveUser(Users(
-          name: "",
-          email: "",
-          password: "",
-          birth: DateTime.now(),
-          phone: "",
-          gender: true));
-    } else {
-      UserRepository.loadUser();
-    }
-  }
+  // Future<void> setUser() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String stringUser = prefs.getString('User') ?? "";
+  //   if (stringUser.isEmpty) {
+  //     UserRepository.saveUser(Users(
+  //         name: "",
+  //         email: "",
+  //         password: "",
+  //         birth: DateTime.now(),
+  //         phone: "",
+  //         gender: true));
+  //   } else {
+  //     UserRepository.loadUser();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

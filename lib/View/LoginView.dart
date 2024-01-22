@@ -1,12 +1,9 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SignupView.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/Users.dart';
 import 'DrawerView.dart';
@@ -31,41 +28,7 @@ _signInWithGoogle() async {
 
   UserCredential userCredential =
       await FirebaseAuth.instance.signInWithCredential(credential);
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Row(
-            children: [
-              Icon(
-                Icons.check_circle,
-                color: Colors.green,
-              ),
-              SizedBox(width: 5),
-              Text(
-                'Đăng nhập thành công',
-                style: TextStyle(fontSize: 20),
-              ),
-            ],
-          ),
-          content: const Text(
-            'Chúc mừng! Bạn đã đăng nhập thành công.',
-            style: TextStyle(fontSize: 20),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const HomeView()));
-              },
-              child: const Text('Đóng'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   print(userCredential.user?.displayName);
 }
 
@@ -87,8 +50,8 @@ Future<User?> loginUsingEmailPassword(
         phone: "",
         gender: true));
   } on FirebaseAuthException catch (e) {
-    if (e.code == "user-not-found") {
-      print("No user found that email");
+    if (e.code == "không tồn tại") {
+      print("Không tìm thấy user");
     }
   }
   return user;
@@ -111,6 +74,26 @@ class _LoginViewState extends State<LoginView> {
         _accountNameError = '';
       }
     });
+  }
+
+  void validateEmail() {
+    setState(() {
+      final email = _accountNameController.text.trim();
+      if (email.isEmpty) {
+        _accountNameError = 'Email không được bỏ trống';
+      } else if (!_isValidEmail(email)) {
+        _accountNameError = 'Email không hợp lệ';
+      } else {
+        _accountNameError = '';
+      }
+    });
+  }
+
+  bool _isValidEmail(String email) {
+    // Biểu thức chính quy để kiểm tra định dạng email
+    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(email);
   }
 
   void validatePassword() {
@@ -203,7 +186,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         child: TextField(
                           controller: _accountNameController,
-                          onChanged: (_) => validateAccountName(),
+                          onChanged: (_) => validateEmail(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             labelText: "Nhập email",
@@ -313,15 +296,14 @@ class _LoginViewState extends State<LoginView> {
                               context: context);
                           print(user);
                           if (user != null) {
-                            print("Email là : ");
-                            // ignore: use_build_context_synchronously
+                            print("Email là : ${_accountNameController.text}");
+                            //Gọi hàm đăng nhập thành công
                             _showSuccessDialog(context);
                           } else {
                             print("User or Password is not Correct !!");
-                            // ignore: use_build_context_synchronously
+                            //Gọi hàm đăng nhập thất bại
                             _showFailedDialog(context);
                           }
-                          ;
                         },
                         child: Text(
                           "Đăng nhập",
@@ -421,6 +403,8 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.pop(context);
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const HomeView()));
               },
               child: const Text('Đóng'),
             ),

@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:news_app/Repository/NewsRepository.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/LoginView.dart';
@@ -33,7 +31,7 @@ class _BottomNavState extends State<BottomNav> {
         print("Lấy thành công user: ${UserRepository.user!.name}");
       });
     }).catchError((onError) {
-      print("Lấy user không thành công");
+      // print("Lấy user không thành công");
     });
   }
 
@@ -84,8 +82,8 @@ class _BottomNavState extends State<BottomNav> {
           if (widget.idx != 1) {
             print("Thông báo");
             //Trang thông báo
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => NotificationView()));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const NotificationView()));
           }
         }
         if (indexOfItem == 2) {
