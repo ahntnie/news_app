@@ -19,24 +19,24 @@ class _StartViewState extends State<StartView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // setUser();
+    setUser();
   }
 
-  // Future<void> setUser() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String stringUser = prefs.getString('User') ?? "";
-  //   if (stringUser.isEmpty) {
-  //     UserRepository.saveUser(Users(
-  //         name: "",
-  //         email: "",
-  //         password: "",
-  //         birth: DateTime.now(),
-  //         phone: "",
-  //         gender: true));
-  //   } else {
-  //     UserRepository.loadUser();
-  //   }
-  // }
+  Future<void> setUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String stringUser = prefs.getString('User') ?? "";
+    if (stringUser.isEmpty) {
+      UserRepository.saveUser(Users(
+          name: "",
+          email: "",
+          password: "",
+          birth: DateTime.now(),
+          phone: "",
+          gender: true));
+    } else {
+      UserRepository.loadUser();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

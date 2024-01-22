@@ -104,7 +104,6 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    loadUser();
     return Scaffold(
         bottomNavigationBar: const BottomNav(idx: 2),
         body: SingleChildScrollView(
