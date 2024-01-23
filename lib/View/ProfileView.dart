@@ -95,7 +95,8 @@ class _ProfileViewState extends State<ProfileView> {
                 children: [
                   Column(children: [
                     const CircleAvatar(
-                      backgroundImage: AssetImage("assets/image/avt.png"),
+                      backgroundImage:
+                          AssetImage("assets/image/login_avatar.png"),
                       minRadius: 45,
                     ),
                     TextButton(
@@ -151,7 +152,7 @@ class _ProfileViewState extends State<ProfileView> {
               Visibility(
                 visible: isShowName,
                 replacement: TextField(
-                    controller: isShowName ? name : displayNameController,
+                    controller: name,
                     readOnly: true,
                     decoration: InputDecoration(
                         filled: true,
