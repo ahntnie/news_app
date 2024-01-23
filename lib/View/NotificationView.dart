@@ -1,9 +1,14 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Model/News.dart';
+import 'package:news_app/Presenter/CommentPresenter.dart';
+import 'package:news_app/Repository/CommentRepository.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/CategoryDetailView.dart';
 import 'package:news_app/View/DrawerView.dart';
+import 'package:news_app/View/LoginView.dart';
 import 'package:news_app/View/NavigationBarView.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -12,7 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class NotificationView extends StatefulWidget {
-  const NotificationView({super.key});
+  const NotificationView({
+    super.key,
+  });
 
   @override
   State<NotificationView> createState() => _NotificationViewState();
@@ -38,7 +45,7 @@ class _NotificationViewState extends State<NotificationView> {
   final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
 
   List<News> viewedNews = [];
-
+  List<Comment> viewedNotiCmt = [];
   @override
   void initState() {
     super.initState();
@@ -65,8 +72,36 @@ class _NotificationViewState extends State<NotificationView> {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:$minute';
   }
 
+  List<Comment> lstNotification = [];
+  List<Comment> lstGetCmt = [];
+  Future<void> getNotification(String email) async {
+    CommentRepository.loadNotiCmt().then((value) {
+      setState(() {
+        CommentRepository.lstCmts = value;
+        print("Load thành công");
+      });
+    });
+
+    CommentRepository.getUserComment(email).then((value) {
+      // setState(() {
+      lstGetCmt = value;
+    }).catchError((onError) {
+      print("lỗi");
+    });
+    lstNotification = [];
+    for (var cmtt in lstGetCmt) {
+      for (var like in cmtt.lstLike) {
+        if (like != UserRepository.user.email) {
+          lstNotification.add(cmtt);
+        }
+        CommentRepository.saveNotiCmt(lstNotification);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    getNotification(UserRepository.user.email.toString());
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -236,13 +271,99 @@ class _NotificationViewState extends State<NotificationView> {
   }
 
   Widget _TabComment() {
-    return const Center(
-      child: Text('Không có bình luận'),
+    if (lstNotification.isEmpty) {
+      return Center(
+        child: Text("Không có thông báo"),
+      );
+    }
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Column(children: lstNotification.map((e) => BoxComment(e)).toList())
+        ],
+      ),
     );
   }
 
-  List<Widget> lstComment = [];
-  List<Comment> lstGetCmt = [];
+  String lstUserLike(Iterable<dynamic> lst) {
+    String user = "";
+    lst.forEach((element) {
+      user = (user + "," + element).toString();
+    });
+    return user;
+  }
+
+  // late Comment cmt;
+  Container BoxComment(Comment cmt) {
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      // padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: Colors.grey.shade300,
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      width: MediaQuery.of(context).size.width / 0.1,
+      height: MediaQuery.of(context).size.height / 7,
+      constraints: const BoxConstraints(
+        minHeight: 100.0,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              width: MediaQuery.of(context).size.width / 2,
+              //height: MediaQuery.of(context).size.height / 8,
+              decoration: const BoxDecoration(),
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
+                          child: Image.asset(
+                            "assets/image/avt.png",
+                            fit: BoxFit.cover,
+                            height: 80,
+                            width: 80,
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding:
+                                const EdgeInsets.only(left: 10, bottom: 30),
+                            child: Text(
+                              "${cmt.lstLike.contains(
+                                UserRepository.user.email,
+                              ) ? lstUserLike(cmt.lstLike.where(
+                                  (like) =>
+                                      UserRepository.user.email.toString() !=
+                                      like,
+                                )).substring(1) : cmt.lstLike.first} đã thích bình luận của bạn",
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(cmt.time.toString()),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _TabStoryAgain() {
     void desc = "";
