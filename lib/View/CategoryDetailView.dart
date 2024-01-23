@@ -29,21 +29,18 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   List<Widget> lstComment = [];
   List<Comment> lstGetCmt = [];
   Future<void> getComment() async {
-    //lstComment
-    //print("Vào get nè");
     setState(() {
-      //print(widget.news.title.toString());
       CommentPresenter.getComment(
         widget.news.title.toString(),
       ).then((value) {
         setState(() {
           lstGetCmt = CommentRepository.lstComments;
-          lstComment = lstGetCmt.map((e) => BoxComment(e)).toList();
         });
       });
     });
   }
 
+  int countt = 0;
   void addComment(Comment comment) {
     setState(() {
       lstComment.add(
@@ -54,9 +51,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     });
   }
 
-  bool isLike = false;
-  int like = 0;
-  Future<void> likeComment(Comment cmt) async {
+  Future<Comment> likeComment(Comment cmt) async {
     var ref = await FirebaseDatabase.instance
         .ref()
         .child("comment")
@@ -70,41 +65,40 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             count++) {
           lstLike.add(
               _cmt.child("lstLike").child(count.toString()).value.toString());
+          setState(() {
+            cmt.lstLike = lstLike;
+          });
         }
-        if (lstLike.contains(UserRepository.user?.email.toString())) {
-          lstLike.remove(UserRepository.user?.email.toString());
-
-          if (cmt.time == _cmt.child("time").value.toString()) {
-            isLike = false;
-            like = lstLike.length;
-          }
-        } else {
+        if (lstLike.isEmpty ||
+            !lstLike.contains(UserRepository.user!.email.toString())) {
           lstLike.add(UserRepository.user!.email.toString());
-
-          if (cmt.time == _cmt.child("time").value.toString()) {
-            isLike = true;
-            like = lstLike.length;
-          }
+        } else if (lstLike.contains(UserRepository.user!.email.toString())) {
+          lstLike.remove(UserRepository.user!.email.toString());
         }
-
-        await FirebaseDatabase.instance
+        var ref1 = await FirebaseDatabase.instance
             .ref()
             .child("comment")
             .child(cmt.title)
             .child(_cmt.key.toString())
             .child("lstLike")
             .set(lstLike)
-            .then((value) {})
-            .catchError((onError) {
+            .then((value) {
+          cmt.lstLike = lstLike;
+
+          getComment();
+          print("Tăng like thành công");
+        }).catchError((onError) {
           print('Tăng like không thành công');
         });
         break;
       }
     }
+    return cmt;
   }
 
   bool flagg = false;
   Container BoxComment(Comment cmt) {
+    //print("${cmt.lstLike.length}  ${cmt.content}");
     return Container(
       margin: const EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
@@ -133,7 +127,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(50)),
                             child: Image.asset(
-                              "assets/image/vien.jpg",
+                              "assets/image/avt.png",
                               fit: BoxFit.cover,
                               height: 40,
                               width: 40,
@@ -155,60 +149,72 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                           Container(
                             padding: EdgeInsets.only(
                                 left: MediaQuery.of(context).size.width / 10),
-                            child: Row(
+                            child: Column(
                               children: [
                                 IconButton(
-                                  onPressed: () {
-                                    if (UserRepository.user!.email.isEmpty) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Thông báo'),
-                                            content: const Text(
-                                                'Vui lòng đăng nhập để bình luận'),
-                                            actions: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('Đóng'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      // Chuyển sang tap đăng nhập khi chưa đăng nhập
-                                                      Navigator.of(context).push(
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const LoginView()));
-                                                    },
-                                                    child:
-                                                        const Text('Đăng nhập'),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    } else {
-                                      likeComment(cmt);
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    color: isLike ? Colors.red : null,
-                                  ),
-                                ),
-                                Text(like != 0 ? "$like" : "")
+                                    onPressed: () async {
+                                      var ref = await FirebaseDatabase.instance
+                                          .ref()
+                                          .child("comment")
+                                          .child(cmt.title)
+                                          .get();
+                                      List<String> lstLike = [];
+
+                                      if (UserRepository.user!.email!.isEmpty) {
+                                        // ignore: use_build_context_synchronously
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: const Text('Thông báo'),
+                                              content: const Text(
+                                                  'Vui lòng đăng nhập để bình luận'),
+                                              actions: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: const Text('Đóng'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        // Chuyển sang tap đăng nhập khi chưa đăng nhập
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        const LoginView()));
+                                                      },
+                                                      child: const Text(
+                                                          'Đăng nhập'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        cmt = await likeComment(cmt);
+                                      }
+                                    },
+                                    icon: Icon(
+                                      Icons.favorite,
+                                      color: cmt.lstLike.contains(UserRepository
+                                              .user!.email
+                                              .toString())
+                                          ? Colors.red
+                                          : null,
+                                    )),
+                                Text(cmt.lstLike.length.toString())
                               ],
                             ),
                           ),
@@ -248,7 +254,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   void initState() {
     super.initState();
     fetchData();
-
+    // getComment();
     CommentRepository.lstComments = List.filled(
         0,
         Comment(
@@ -489,7 +495,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         if (cmt.text.isNotEmpty) {
                           CommentRepository.setComment(Comment(
                             lstLike: [],
-                            content: cmt.text,
+                            content: cmt.text.trim(),
                             email: UserRepository.user!.email.toString(),
                             time: DateTime.now().toString().substring(0, 19),
                             nameUser: UserRepository.user!.name.toString(),

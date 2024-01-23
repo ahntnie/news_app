@@ -26,7 +26,7 @@ class _SignupViewState extends State<SignupView> {
   String _emailError = '';
   bool _obscureText = true;
   bool _obscureText2 = true;
-
+//hàm đăng kí tạo tài khoản
   void signup() async {
     try {
       final UserCredential? userCredential = await _auth
@@ -46,6 +46,7 @@ class _SignupViewState extends State<SignupView> {
     }
   }
 
+//hàm kiểm tra tên tài khoản
   void validateAccountName() {
     setState(() {
       final accountName = _accountNameController.text.trim();
@@ -59,6 +60,7 @@ class _SignupViewState extends State<SignupView> {
     });
   }
 
+//hàm kiểm tra password có trùng với password trước hay không
   void validaterePassword() {
     setState(() {
       final password = _passwordController.text.trim();
@@ -70,6 +72,7 @@ class _SignupViewState extends State<SignupView> {
     });
   }
 
+//hàm kiểm tra tên password
   void validatePassword() {
     setState(() {
       final accountPassword = _passwordController.text.trim();
@@ -84,6 +87,7 @@ class _SignupViewState extends State<SignupView> {
       }
     });
   }
+//hàm kiểm tra password có trùng với password trước hay không
 
   void validateRepassword() {
     setState(() {
@@ -97,6 +101,7 @@ class _SignupViewState extends State<SignupView> {
       }
     });
   }
+//hàm kiểm tra email có hợp lệ hay không
 
   void validateEmail() {
     setState(() {
@@ -267,7 +272,7 @@ class _SignupViewState extends State<SignupView> {
                         child: TextField(
                           obscureText: _obscureText2,
                           controller: _repasswordController,
-                          onChanged: (_) => validatePassword(),
+                          onChanged: (_) => validateRepassword(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             labelText: "Nhập lại mật khẩu",
@@ -290,7 +295,7 @@ class _SignupViewState extends State<SignupView> {
                             contentPadding: EdgeInsets.only(
                                 left: size(context, 6), bottom: 10),
                             errorText: _repasswordError.isNotEmpty
-                                ? _accountPasswordError
+                                ? _repasswordError
                                 : null,
                           ),
                         ),

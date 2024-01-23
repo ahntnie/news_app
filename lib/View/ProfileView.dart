@@ -136,8 +136,7 @@ class _ProfileViewState extends State<ProfileView> {
                 children: [
                   Column(children: [
                     const CircleAvatar(
-                      backgroundImage:
-                          AssetImage("assets/image/login_avatar.png"),
+                      backgroundImage: AssetImage("assets/image/avt.png"),
                       minRadius: 45,
                     ),
                     TextButton(

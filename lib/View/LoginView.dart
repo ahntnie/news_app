@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/Model/Users.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
 import 'package:news_app/View/SignupView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Model/Users.dart';
 import 'DrawerView.dart';
 import 'ForgetPasswordView.dart';
 import 'NavigationBarView.dart';
