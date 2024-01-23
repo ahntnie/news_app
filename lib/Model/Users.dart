@@ -1,8 +1,8 @@
 
 class Users {
-  final String name;
+  late final String name;
   final String email;
-  final String phone;
+  late final String phone;
   final DateTime birth;
   final String password;
   final bool gender;

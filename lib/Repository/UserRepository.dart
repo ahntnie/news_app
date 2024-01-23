@@ -97,7 +97,6 @@ class UserRepository {
   static Future<void> updateGoogleUserInfo(String phone, String name) async {
     var Gguser = FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
-        print(user.displayName);
         user.updatePhoneNumber(phone as PhoneAuthCredential);
         user.updateDisplayName(name);
       }

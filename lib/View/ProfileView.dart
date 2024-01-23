@@ -29,7 +29,6 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     loadUser();
-    // loadUserGoogle();
   }
 
   bool isShowName = false;
@@ -62,7 +61,6 @@ class _ProfileViewState extends State<ProfileView> {
       phone: "",
       gender: false);
 
-
   Future<void> _signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
@@ -77,15 +75,37 @@ class _ProfileViewState extends State<ProfileView> {
     print('Đã đăng xuất');
   }
 
+  Future<void> loadUser() async {
+    await UserRepository.getUsers().then((value) {
+      for (var user in UserRepository.lstUsers) {
+        if (user.name == UserRepository.user!.name.toString()) {
+          UserRepository.user = user;
+          break;
+        }
+      }
+    });
 
-  void loadUser() {
-    _user = UserRepository.user!;
-    name.text = _user.name;
-    email.text = _user.email;
-    pass.text = _user.password;
-    birth.text = DateFormat('dd/MM/yyyy').format(_user.birth);
-    phone.text = _user.phone;
-    gender.text = _user.gender ? "Nữ" : "Nam";
+    if (_auth.currentUser != null) {
+      _auth.authStateChanges().listen((User? user) {
+        if (user != null) {
+          name.text = user.displayName.toString();
+          email.text = user.email.toString();
+          phone.text = user.phoneNumber.toString();
+        }
+      });
+    } else if (UserRepository.user != null) {
+      _user = UserRepository.user!;
+      name.text = _user.name;
+      email.text = _user.email;
+      pass.text = _user.password;
+      birth.text = DateFormat('dd/MM/yyyy').format(_user.birth);
+      phone.text = _user.phone;
+      gender.text = _user.gender ? "Nữ" : "Nam";
+    } else if (_googleSignIn.currentUser != null) {
+      GoogleSignInAccount googleUser = _googleSignIn.currentUser!;
+      name.text = googleUser.displayName.toString();
+      email.text = googleUser.email;
+    }
   }
 
   void updateUser() {
