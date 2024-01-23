@@ -152,7 +152,7 @@ class _ProfileViewState extends State<ProfileView> {
               Visibility(
                 visible: isShowName,
                 replacement: TextField(
-                    controller: name,
+                    controller: isShowName ? name : displayNameController,
                     readOnly: true,
                     decoration: InputDecoration(
                         filled: true,

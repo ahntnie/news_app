@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:news_app/Repository/UserRepository.dart';
 import 'package:news_app/View/HomeView.dart';
+import 'package:news_app/View/ProfileView.dart';
 import 'package:news_app/View/SignupView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/Users.dart';
 import 'DrawerView.dart';
@@ -18,6 +20,17 @@ class LoginView extends StatefulWidget {
 }
 
 //hàm đăng nhập bằng Google
+// Hàm lưu thông tin người dùng vào SharedPreferences
+void saveUserInfo(String displayName) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(
+    'displayName',
+    displayName,
+  );
+}
+
+TextEditingController displayNameController = TextEditingController();
+// Hàm đăng nhập bằng Google và chuyển sang trang profile
 _signInWithGoogle() async {
   GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
   GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -30,7 +43,15 @@ _signInWithGoogle() async {
   UserCredential userCredential =
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-  print(userCredential.user?.displayName);
+  String? displayName = userCredential.user?.displayName;
+  if (displayName != null) {
+    displayNameController.text = displayName;
+    // Save the user information to SharedPreferences
+    saveUserInfo(displayName);
+    print("Đã lưu thông tin người dùng");
+    print(displayName);
+    // Navigate to the profile page
+  }
 }
 
 //hàm đăng nhập bằng username và password của firebase
@@ -410,8 +431,8 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.pop(context);
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const HomeView()));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ProfileView()));
               },
               child: const Text('Đóng'),
             ),
