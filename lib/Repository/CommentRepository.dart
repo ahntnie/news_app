@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:news_app/Model/Comment.dart';
+import 'package:news_app/Repository/UserRepository.dart';
 
 class CommentRepository {
   static List<Comment> lstComments = List.filled(
@@ -27,6 +28,53 @@ class CommentRepository {
     }).catchError((onError) {
       print('Thêm bình luận không thành công');
     });
+  }
+
+  static Future<List<Comment>> getUserComment(String? email) async {
+    List<Comment> lstCmt = List.filled(
+        0,
+        Comment(
+          lstLike: [],
+          title: "",
+          nameUser: "",
+          email: "",
+          content: "",
+          time: "",
+        ),
+        growable: true);
+    List<String> lst = [];
+
+    var response = await FirebaseDatabase.instance.ref().child("comment").get();
+    for (DataSnapshot title in response.children) {
+      for (DataSnapshot cmt in title.children) {
+        if (cmt.child("email").value.toString() == UserRepository.user.email) {
+          lst = [];
+          if (cmt.child("lstLike").children.isEmpty) {
+            lst = [];
+          } else {
+            for (var count = 0;
+                count < cmt.child("lstLike").children.length;
+                count++) {
+              lst.add(cmt
+                  .child("lstLike")
+                  .child(count.toString())
+                  .value
+                  .toString());
+            }
+          }
+          lstCmt.add(Comment(
+            lstLike: lst,
+            content: cmt.child("content").value.toString(),
+            email: cmt.child("email").value.toString(),
+            time: cmt.child("time").value.toString(),
+            nameUser: cmt.child("nameUser").value.toString(),
+            title: cmt.child("title").value.toString(),
+          ));
+        }
+      }
+      // print("Bài viết nè ${comment.key.toString()}");
+    }
+    return lstCmt;
   }
 
   static Future<void> getComment(String title) async {

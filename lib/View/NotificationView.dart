@@ -42,11 +42,23 @@ class _NotificationViewState extends State<NotificationView> {
     return viewedNews;
   }
 
-  Future<void> saveNotiCmt(List<Comment> viewedNews) async {
+  Future<List<Comment>> loadNotiCmt() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> viewedCmtJsonList =
-        viewedNotiCmt.map((comments) => jsonEncode(comments.toJson())).toList();
-    await prefs.setStringList('viewedNotiCmt', viewedCmtJsonList);
+    // prefs.remove('lstNotification');
+    List<String> viewedCmtsJsonList =
+        prefs.getStringList('lstNotification') ?? [];
+    List<Comment> viewedCmts = viewedCmtsJsonList
+        .map((json) => Comment.fromJson(jsonDecode(json)))
+        .toList();
+    return viewedCmts;
+  }
+
+  Future<void> saveNotiCmt(List<Comment> lstNotification) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedCmtJsonList = lstNotification
+        .map((comments) => jsonEncode(comments.toJson()))
+        .toList();
+    await prefs.setStringList('lstNotification', viewedCmtJsonList);
   }
 
   final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
@@ -79,9 +91,40 @@ class _NotificationViewState extends State<NotificationView> {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:$minute';
   }
 
+  List<Comment> lstNotification = [];
+  List<Comment> lstGetCmt = [];
+  Future<void> getNotification(String email) async {
+    loadNotiCmt().then((value) {
+      setState(() {
+        lstNotification = value;
+        //    print(lstNotification.length);
+      });
+    });
+    CommentRepository.getUserComment(email).then((value) {
+      // setState(() {
+      lstGetCmt = value;
+    }).catchError((onError) {
+      print("lỗi");
+    });
+    lstNotification = [];
+    for (var cmtt in lstGetCmt) {
+      for (var like in cmtt.lstLike) {
+        if (like != UserRepository.user.email) {
+          print("Email : ${cmtt.lstLike}");
+          lstNotification.add(cmtt);
+          print("Add ${like.toString()}");
+          saveNotiCmt(lstNotification);
+          print("lst1 :${lstNotification}");
+        }
+        saveNotiCmt(lstNotification);
+        //  print("lst2 :${lstNotification}");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    getComment();
+    getNotification(UserRepository.user.email.toString());
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -251,56 +294,30 @@ class _NotificationViewState extends State<NotificationView> {
   }
 
   Widget _TabComment() {
-    if (lstGetCmt.isEmpty) {
+    if (lstNotification.isEmpty) {
       return Center(
-        child: Text("Không có bình luận"),
+        child: Text("Không có thông báo"),
       );
     }
     return SingleChildScrollView(
       child: Column(
         children: [
-          Column(children: lstGetCmt.map((e) => BoxComment(e)).toList())
+          Column(children: lstNotification.map((e) => BoxComment(e)).toList())
         ],
       ),
     );
-
-    //}
   }
 
-  List<Comment> lstGetCmt = [];
-  Future<void> getComment() async {
-    setState(() {
-      setState(() {
-        lstGetCmt = CommentRepository.lstComments;
-      });
+  String lstUserLike(Iterable<dynamic> lst) {
+    String user = "";
+    lst.forEach((element) {
+      user = (user + "," + element).toString();
     });
-  }
-
-  Future<void> checklikeComment(Comment cmt) async {
-    var ref = await FirebaseDatabase.instance
-        .ref()
-        .child("comment")
-        .child(cmt.title)
-        .get();
-    List<String> lstLike = [];
-    for (var _cmt in ref.children) {
-      if (cmt.time == _cmt.child("time").value.toString()) {
-        for (var count = 0;
-            count < _cmt.child("lstLike").children.length;
-            count++) {
-          lstLike.add(
-              _cmt.child("lstLike").child(count.toString()).value.toString());
-          setState(() {
-            cmt.lstLike = lstLike;
-          });
-        }
-      }
-    }
+    return user;
   }
 
   // late Comment cmt;
   Container BoxComment(Comment cmt) {
-    checklikeComment(cmt);
     return Container(
       margin: const EdgeInsets.all(8.0),
       // padding: const EdgeInsets.all(8.0),
@@ -343,7 +360,13 @@ class _NotificationViewState extends State<NotificationView> {
                             padding:
                                 const EdgeInsets.only(left: 10, bottom: 30),
                             child: Text(
-                              "${cmt.nameUser.toString()} đã thích bình luận của bạn",
+                              "${cmt.lstLike.contains(
+                                UserRepository.user.email,
+                              ) ? lstUserLike(cmt.lstLike.where(
+                                  (like) =>
+                                      UserRepository.user.email.toString() !=
+                                      like,
+                                )).substring(1) : cmt.lstLike.first} đã thích bình luận của bạn",
                             ),
                           ),
                         ),
@@ -364,9 +387,6 @@ class _NotificationViewState extends State<NotificationView> {
       ),
     );
   }
-
-  List<Widget> lstComments = [];
-  List<Comment> lstGetCmts = [];
 
   Widget _TabStoryAgain() {
     void desc = "";
