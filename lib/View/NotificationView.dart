@@ -42,25 +42,6 @@ class _NotificationViewState extends State<NotificationView> {
     return viewedNews;
   }
 
-  Future<List<Comment>> loadNotiCmt() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.remove('lstNotification');
-    List<String> viewedCmtsJsonList =
-        prefs.getStringList('lstNotification') ?? [];
-    List<Comment> viewedCmts = viewedCmtsJsonList
-        .map((json) => Comment.fromJson(jsonDecode(json)))
-        .toList();
-    return viewedCmts;
-  }
-
-  Future<void> saveNotiCmt(List<Comment> lstNotification) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> viewedCmtJsonList = lstNotification
-        .map((comments) => jsonEncode(comments.toJson()))
-        .toList();
-    await prefs.setStringList('lstNotification', viewedCmtJsonList);
-  }
-
   final rssUrl = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
 
   List<News> viewedNews = [];
@@ -94,12 +75,13 @@ class _NotificationViewState extends State<NotificationView> {
   List<Comment> lstNotification = [];
   List<Comment> lstGetCmt = [];
   Future<void> getNotification(String email) async {
-    loadNotiCmt().then((value) {
+    CommentRepository.loadNotiCmt().then((value) {
       setState(() {
-        lstNotification = value;
-        //    print(lstNotification.length);
+        CommentRepository.lstCmts = value;
+        print("Load thành công");
       });
     });
+
     CommentRepository.getUserComment(email).then((value) {
       // setState(() {
       lstGetCmt = value;
@@ -110,14 +92,9 @@ class _NotificationViewState extends State<NotificationView> {
     for (var cmtt in lstGetCmt) {
       for (var like in cmtt.lstLike) {
         if (like != UserRepository.user.email) {
-          print("Email : ${cmtt.lstLike}");
           lstNotification.add(cmtt);
-          print("Add ${like.toString()}");
-          saveNotiCmt(lstNotification);
-          print("lst1 :${lstNotification}");
         }
-        saveNotiCmt(lstNotification);
-        //  print("lst2 :${lstNotification}");
+        CommentRepository.saveNotiCmt(lstNotification);
       }
     }
   }

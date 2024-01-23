@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:news_app/Model/Comment.dart';
 import 'package:news_app/Repository/UserRepository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommentRepository {
   static List<Comment> lstComments = List.filled(
@@ -121,5 +124,26 @@ class CommentRepository {
         // print("Bài viết nè ${comment.key.toString()}");
       }
     }
+  }
+
+  static List<Comment> lstCmts = [];
+  static Future<List<Comment>> loadNotiCmt() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.remove('lstNotification');
+    List<String> viewedCmtsJsonList =
+        prefs.getStringList('lstNotification') ?? [];
+    List<Comment> viewedCmts = viewedCmtsJsonList
+        .map((json) => Comment.fromJson(jsonDecode(json)))
+        .toList();
+    lstCmts = viewedCmts;
+    return viewedCmts;
+  }
+
+  static Future<void> saveNotiCmt(List<Comment> lstNotification) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> viewedCmtJsonList = lstNotification
+        .map((comments) => jsonEncode(comments.toJson()))
+        .toList();
+    await prefs.setStringList('lstNotification', viewedCmtJsonList);
   }
 }
